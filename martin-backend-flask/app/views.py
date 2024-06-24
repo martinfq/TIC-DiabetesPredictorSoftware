@@ -1,7 +1,5 @@
-from flask import Blueprint, request, jsonify
-from .services import process_data
-from .models.models import User
-from .config import db
+from flask import Blueprint, jsonify
+from .db.neo4j import db
 
 main_blueprint = Blueprint('main', __name__)
 
