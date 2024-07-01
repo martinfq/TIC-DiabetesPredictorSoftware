@@ -44,7 +44,8 @@ def get_user(username):
     user = User.get_user_by_username(username)
     if user:
         return jsonify({"username": user.username, "email": user.email}), 200
-    return jsonify({"message": "User not found"}), 404
+    else:
+        return jsonify({"message": "User not found or error occurred"}), 404
 
 
 @user_blueprint.route('/user/email/<email>', methods=['GET'])
@@ -52,4 +53,5 @@ def get_user_by_email(email):
     user = User.get_user_by_email(email)
     if user:
         return jsonify({"username": user.username, "email": user.email}), 200
-    return jsonify({"message": "User not found"}), 404
+    else:
+        return jsonify({"message": "User not found or error occurred"}), 404
