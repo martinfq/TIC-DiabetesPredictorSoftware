@@ -1,5 +1,5 @@
 from neo4j import GraphDatabase
-from ..config import Config
+from .config import Config
 
 
 class Database:
