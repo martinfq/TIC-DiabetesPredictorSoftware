@@ -1,8 +1,12 @@
 from ..db.neo4j import db
 from .predition_service import process_data
 from .models import ModeloML
+
+
 class Prediction:
-    def __init__(self,id, high_bp, high_chol, bmi, smoker, stroke, heart_disease_or_attack, phys_activity, gen_hlth,
+    next_id = 1
+
+    def __init__(self, id, high_bp, high_chol, bmi, smoker, stroke, heart_disease_or_attack, phys_activity, gen_hlth,
                  ment_hlth, phys_hlth, age):
         self.id = id
         self.HighBp = high_bp
@@ -18,7 +22,8 @@ class Prediction:
         self.Age = age
 
     @staticmethod
-    def create_prediction(high_bp, high_chol, bmi, smoker, stroke, heart_disease_or_attack, phys_activity, gen_hlth,
+    def create_prediction(cls, high_bp, high_chol, bmi, smoker, stroke, heart_disease_or_attack, phys_activity,
+                          gen_hlth,
                           ment_hlth, phys_hlth, age):
         # Convertir todos los parámetros a floats
         high_bp = float(high_bp)
@@ -42,7 +47,9 @@ class Prediction:
         predict, error = modelo.predecir2(data)
         prediction = float(predict[0])
 
-        next_id = db.get_next_id()
+        # Obtener el próximo ID y crear la predicción
+        next_id = cls.next_id
+        cls.next_id += 1  # Incrementar el contador estático
 
         db.execute_write(
             """
@@ -79,7 +86,7 @@ class Prediction:
             }
         )
         return Prediction(next_id,
-            high_bp, high_chol, bmi, smoker, stroke,
-            heart_disease_or_attack, phys_activity, gen_hlth,
-            ment_hlth, phys_hlth, age
-        )
+                          high_bp, high_chol, bmi, smoker, stroke,
+                          heart_disease_or_attack, phys_activity, gen_hlth,
+                          ment_hlth, phys_hlth, age
+                          )
