@@ -12,16 +12,7 @@ class User:
         self.genero = genero
 
     @staticmethod
-    def required_fields(**kwargs):
-        required_fields = ['username', 'email', 'nombre', 'apellido', 'contraseña']
-        for field in required_fields:
-            if not kwargs.get(field):
-                raise ValueError(f"El campo '{field}' es obligatorio.")
-
-    @staticmethod
     def create_user(username, email, nombre, apellido, contraseña, fecha_nacimiento=None, genero=None):
-        User.required_fields(username=username, email=email, nombre=nombre, apellido=apellido, contraseña=contraseña)
-
         db.execute_write(
             """
             CREATE (u:User {
@@ -46,30 +37,33 @@ class User:
         )
         return User(username, email, nombre, apellido, contraseña, fecha_nacimiento, genero)
 
-    def get_user(query, value):
-        try:
-            result = db.execute_read(
-                f"""
+
+def get_user(query, value):
+    try:
+        result = db.execute_read(
+            f"""
                    MATCH (u:User {{{query}: $value}}) 
                    RETURN u.username AS username, u.email AS email, u.nombre AS nombre, u.apellido AS apellido, 
                           u.contraseña AS contraseña, u.fecha_nacimiento AS fecha_nacimiento, u.genero AS genero
                    """,
-                {"value": value}
-            )
-            if result:
-                record = result[0]
-                return User(record["username"], record["email"], record["nombre"], record["apellido"],
-                            record["contraseña"], record["fecha_nacimiento"], record["genero"])
-            return None
-        except Exception as e:
-            # Manejo de excepciones
-            print(f"Error al obtener el usuario: {e}")
-            return None
+            {"value": value}
+        )
+        if result:
+            record = result[0]
+            return User(record["username"], record["email"], record["nombre"], record["apellido"],
+                        record["contraseña"], record["fecha_nacimiento"], record["genero"])
+        return None
+    except Exception as e:
+        # Manejo de excepciones
+        print(f"Error al obtener el usuario: {e}")
+        return None
 
-    @staticmethod
-    def get_user_by_username(username):
-        return User.get_user("username", username)
 
-    @staticmethod
-    def get_user_by_email(email):
-        return User.get_user("email", email)
+@staticmethod
+def get_user_by_username(username):
+    return User.get_user("username", username)
+
+
+@staticmethod
+def get_user_by_email(email):
+    return User.get_user("email", email)

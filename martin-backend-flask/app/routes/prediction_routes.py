@@ -1,15 +1,20 @@
 from flask import Blueprint, request, jsonify
+from flask_restful import Resource, Api
 from ..services import process_data
 
 data_blueprint = Blueprint('data', __name__)
+api = Api(data_blueprint)
 
 
-@data_blueprint.route('/model', methods=['POST'])
-def index():
-    data = request.json
-    resultado, error = process_data(data)
+class DataModel(Resource):
+    def post(self):
+        data = request.json
+        resultado, error = process_data(data)
 
-    if error:
-        return jsonify({'error': error}), 400
-    else:
-        return jsonify({'resultado': resultado}), 200
+        if error:
+            return {'error': error}, 400
+        else:
+            return {'resultado': resultado}, 200
+
+
+api.add_resource(DataModel, '/model')
