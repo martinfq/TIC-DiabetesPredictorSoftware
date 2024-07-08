@@ -1,0 +1,43 @@
+project_root/
+│
+├── venv/                   # Entorno virtual
+│   ├── bin/                # Ejecutables
+│   ├── include/            # Archivos de cabecera C/C++
+│   ├── lib/                # Bibliotecas de Python
+│   ├── lib64/              # Bibliotecas de 64-bit si aplica
+│   ├── pyvenv.cfg          # Configuración del entorno virtual
+│
+├── app/
+│   ├── __init__.py         # Inicializa la aplicación Flask
+│   ├── config.py           # Configuración de la aplicación
+│   ├── models/             # Definición de modelos de datos
+│   │   ├── __init__.py     # Inicializa los modelos
+│   │   └── user.py         # Modelo de usuario
+│   │   └── prediction.py   # Modelo de predicción
+│   ├── routes/             # Rutas y controladores
+│   │   ├── __init__.py     # Inicializa las rutas
+│   │   └── user.py         # Rutas relacionadas con el usuario
+│   │   └── prediction.py   # Rutas relacionadas con la predicción
+│   ├── services/           # Lógica de negocio
+│   │   ├── __init__.py     # Inicializa los servicios
+│   │   └── user_service.py # Servicio de usuario
+│   │   └── prediction_service.py # Servicio de predicción
+│   ├── schemas/            # Esquemas de validación
+│   │   ├── __init__.py     # Inicializa los esquemas
+│   │   └── user_schema.py  # Esquema de usuario
+│   │   └── prediction_schema.py # Esquema de predicción
+│   ├── utils/              # Utilidades generales
+│   │   ├── __init__.py     # Inicializa las utilidades
+│   │   └── validators.py   # Validadores personalizados
+│   └── templates/          # Plantillas HTML si se necesita
+│
+├── tests/                  # Pruebas unitarias y de integración
+│   ├── __init__.py         # Inicializa los tests
+│   ├── test_user.py        # Pruebas del usuario
+│   ├── test_prediction.py  # Pruebas de predicciones
+│
+├── .env                    # Variables de entorno
+├── .gitignore              # Archivos y carpetas a ignorar por Git
+├── requirements.txt        # Dependencias del proyecto
+├── run.py                  # Script para iniciar la aplicación
+└── README.md               # Documentación del proyecto
