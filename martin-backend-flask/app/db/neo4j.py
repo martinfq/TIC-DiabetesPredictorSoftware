@@ -47,6 +47,24 @@ class Database:
         except Exception as e:
             print(f"Error: An unexpected error occurred while executing write query. Details: {e}")
 
+    def get_next_id(self):
+        try:
+            with self.driver.session() as session:
+                result = session.run("MERGE (c:Counter {name: 'prediction_id'}) "
+                                     "ON CREATE SET c.value = 0 "
+                                     "ON MATCH SET c.value = c.value + 1 "
+                                     "RETURN c.value")
+                return result.single()[0]
+        except exceptions.ClientError as e:
+            print(f"Error: Client error while getting next ID. Details: {e}")
+        except exceptions.DatabaseError as e:
+            print(f"Error: Database error while getting next ID. Details: {e}")
+        except exceptions.TransientError as e:
+            print(f"Error: Transient error while getting next ID. Details: {e}")
+        except Exception as e:
+            print(f"Error: An unexpected error occurred while getting next ID. Details: {e}")
+            return None
+
 
 # Inicializa la conexión
-db = Database(Config.NEO4J_URI,Config.NEO4J_USER, Config.NEO4J_PASSWORD)
+db = Database(Config.NEO4J_URI, Config.NEO4J_USER, Config.NEO4J_PASSWORD)

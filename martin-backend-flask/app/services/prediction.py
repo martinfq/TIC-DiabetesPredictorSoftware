@@ -2,8 +2,9 @@ from ..db.neo4j import db
 from .predition_service import process_data
 from .models import ModeloML
 class Prediction:
-    def __init__(self, high_bp, high_chol, bmi, smoker, stroke, heart_disease_or_attack, phys_activity, gen_hlth,
+    def __init__(self,id, high_bp, high_chol, bmi, smoker, stroke, heart_disease_or_attack, phys_activity, gen_hlth,
                  ment_hlth, phys_hlth, age):
+        self.id = id
         self.HighBp = high_bp
         self.HighChol = high_chol
         self.BMI = bmi
@@ -40,9 +41,13 @@ class Prediction:
         modelo = ModeloML('model.pkl')
         predict, error = modelo.predecir2(data)
         prediction = float(predict[0])
+
+        next_id = db.get_next_id()
+
         db.execute_write(
             """
             CREATE (p:Prediction {
+                id: $id,
                 HighBp: $high_bp,
                 HighChol: $high_chol,
                 BMI: $bmi,
@@ -58,6 +63,7 @@ class Prediction:
             })
             """,
             {
+                "id": next_id,
                 "high_bp": high_bp,
                 "high_chol": high_chol,
                 "bmi": bmi,
@@ -72,7 +78,7 @@ class Prediction:
                 "prediction": prediction
             }
         )
-        return Prediction(
+        return Prediction(next_id,
             high_bp, high_chol, bmi, smoker, stroke,
             heart_disease_or_attack, phys_activity, gen_hlth,
             ment_hlth, phys_hlth, age
