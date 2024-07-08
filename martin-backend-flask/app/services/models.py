@@ -11,3 +11,10 @@ class ModeloML:
             return resultado, None
         except Exception as e:
             return None, str(e)
+
+    def predecir2(self, data):
+        try:
+            resultado = self.model.predict([data])
+            return resultado, None
+        except Exception as e:
+            return None, str(e)
