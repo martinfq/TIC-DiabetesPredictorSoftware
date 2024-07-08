@@ -2,7 +2,6 @@ from marshmallow import Schema, fields, validate
 
 
 class UserSchema(Schema):
-    username = fields.Str(required=True, validate=validate.Length(min=1))
     email = fields.Email(required=True)
     nombre = fields.Str(required=True, validate=validate.Length(min=1))
     apellido = fields.Str(required=True, validate=validate.Length(min=1))

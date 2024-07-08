@@ -22,7 +22,7 @@ class Prediction:
         self.Age = age
 
     @staticmethod
-    def create_prediction(cls, high_bp, high_chol, bmi, smoker, stroke, heart_disease_or_attack, phys_activity,
+    def create_prediction(user_email, high_bp, high_chol, bmi, smoker, stroke, heart_disease_or_attack, phys_activity,
                           gen_hlth,
                           ment_hlth, phys_hlth, age):
         # Convertir todos los parámetros a floats
@@ -47,13 +47,12 @@ class Prediction:
         predict, error = modelo.predecir2(data)
         prediction = float(predict[0])
 
-        # Obtener el próximo ID y crear la predicción
-        next_id = cls.next_id
-        cls.next_id += 1  # Incrementar el contador estático
+        next_id = db.get_next_id()
 
         db.execute_write(
             """
             CREATE (p:Prediction {
+                user_email:$user_email,
                 id: $id,
                 HighBp: $high_bp,
                 HighChol: $high_chol,
@@ -70,6 +69,7 @@ class Prediction:
             })
             """,
             {
+                "user_email": user_email,
                 "id": next_id,
                 "high_bp": high_bp,
                 "high_chol": high_chol,
@@ -84,6 +84,14 @@ class Prediction:
                 "age": age,
                 "prediction": prediction
             }
+        )
+        db.execute_write(
+            """
+            MATCH (u:User {email: 1})
+            MATCH (p:Prediccion {user_email: 1}), (c2:Calificación {id_calificación: 2})
+            CREATE (u)-[:CALIFICÓ {fecha: timestamp()}]->(c1)
+            CREATE (u)-[:CALIFICÓ {fecha: timestamp()}]->(c2)
+            """
         )
         return Prediction(next_id,
                           high_bp, high_chol, bmi, smoker, stroke,

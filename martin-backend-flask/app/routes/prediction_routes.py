@@ -29,6 +29,7 @@ class RegisterPrediction(Resource):
             return {"errors": err.messages}, 400
 
         Prediction.create_prediction(
+            user_email=data['user_email'],
             high_bp=data['HighBp'],
             high_chol=data['HighChol'],
             bmi=data['BMI'],
