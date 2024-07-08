@@ -1,8 +1,8 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from flask_restful import Resource, Api
 from marshmallow import ValidationError
-from ..models.user import User
-from ..schemas.user_schema import UserSchema
+from ..services.user import User
+from .schemas.user_schema import UserSchema
 
 user_blueprint = Blueprint('user', __name__)
 api = Api(user_blueprint)

@@ -1,4 +1,4 @@
-from .models.models import ModeloML
+from ..services.models import ModeloML
 
 modelo = ModeloML('model.pkl')
 

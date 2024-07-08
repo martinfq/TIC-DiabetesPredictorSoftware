@@ -1,6 +1,6 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from flask_restful import Resource, Api
-from ..services import process_data
+from ..services.predition_service import process_data
 
 data_blueprint = Blueprint('data', __name__)
 api = Api(data_blueprint)

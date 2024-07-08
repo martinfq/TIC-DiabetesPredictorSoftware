@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from .db.neo4j import db
+from ..db.neo4j import db
 
 main_blueprint = Blueprint('main', __name__)
 
