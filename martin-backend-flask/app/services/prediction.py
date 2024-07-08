@@ -39,7 +39,7 @@ class Prediction:
         ]
         modelo = ModeloML('model.pkl')
         predict, error = modelo.predecir2(data)
-        print(predict)
+        prediction = float(predict[0])
         db.execute_write(
             """
             CREATE (p:Prediction {
@@ -53,7 +53,7 @@ class Prediction:
                 GenHlth: $gen_hlth,
                 MentHlth: $ment_hlth,
                 PhysHlth: $phys_hlth,
-                Age: $age
+                Age: $age,
                 Prediction: $prediction
             })
             """,
@@ -69,7 +69,7 @@ class Prediction:
                 "ment_hlth": ment_hlth,
                 "phys_hlth": phys_hlth,
                 "age": age,
-                "prediction": predict
+                "prediction": prediction
             }
         )
         return Prediction(
