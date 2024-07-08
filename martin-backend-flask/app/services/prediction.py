@@ -4,7 +4,6 @@ from .models import ModeloML
 
 
 class Prediction:
-    next_id = 1
 
     def __init__(self, id, high_bp, high_chol, bmi, smoker, stroke, heart_disease_or_attack, phys_activity, gen_hlth,
                  ment_hlth, phys_hlth, age):
@@ -85,14 +84,16 @@ class Prediction:
                 "prediction": prediction
             }
         )
-        db.execute_write(
-            """
-            MATCH (u:User {email: 1})
-            MATCH (p:Prediccion {user_email: 1}), (c2:Calificación {id_calificación: 2})
-            CREATE (u)-[:CALIFICÓ {fecha: timestamp()}]->(c1)
-            CREATE (u)-[:CALIFICÓ {fecha: timestamp()}]->(c2)
-            """
-        )
+        query = """
+            MATCH (u:User {email: $email})
+            MATCH (p:Prediction {user_email: $email})
+            CREATE (u)-[:TIENE {fecha: timestamp()}]->(p)
+              """
+        parameters = {
+            "email": user_email,
+        }
+        db.execute_write(query, parameters)
+
         return Prediction(next_id,
                           high_bp, high_chol, bmi, smoker, stroke,
                           heart_disease_or_attack, phys_activity, gen_hlth,
