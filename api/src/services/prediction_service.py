@@ -1,9 +1,9 @@
 import pickle
 import numpy as np
-from database.redisConnection import redis_connection
+from database.redis_connection import redis_connection
 
 
-def cargarModelo():
+def cargar_modelo():
     try:
         with open('modelo.pkl', 'rb') as file:
             modelo_cargado = pickle.load(file)
@@ -12,7 +12,7 @@ def cargarModelo():
         raise RuntimeError(f"No se pudo cargar el modelo: {str(e)}")
 
 
-def predecirDiabetes(modelo, data):
+def predecir_diabetes(modelo, data):
     try:
 
         caracteristicas = np.array([
@@ -35,7 +35,7 @@ def predecirDiabetes(modelo, data):
         raise RuntimeError(f"Error al hacer la predicción: {str(e)}")
 
 
-def obtenerPrediccionesPorUsuario(usuario_id):
+def obtener_predicciones_por_usuario(usuario_id):
     connection = redis_connection()
     claves = connection.keys('prediccion:*')
     predicciones_usuario = []
