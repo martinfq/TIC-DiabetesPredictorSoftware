@@ -4,6 +4,7 @@ from ..services.predition_service import process_data
 from .schemas.prediction_schema import PredictionSchema
 from marshmallow import ValidationError
 from ..services.prediction import Prediction
+
 data_blueprint = Blueprint('data', __name__)
 api = Api(data_blueprint)
 
