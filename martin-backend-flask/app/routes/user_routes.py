@@ -34,7 +34,6 @@ class RegisterUser(Resource):
             return {"message": "User already exists"}, 400
 
         user = User.create_user(
-            username=data['username'],
             email=data['email'],
             nombre=data['nombre'],
             apellido=data['apellido'],
@@ -49,7 +48,7 @@ class GetUserByEmail(Resource):
     def get(self, email):
         user = User.get_user_by_email(email)
         if user:
-            return {"username": user.username, "email": user.email}, 200
+            return {"email": user.email}, 200
         else:
             return {"message": "User not found or error occurred"}, 404
 

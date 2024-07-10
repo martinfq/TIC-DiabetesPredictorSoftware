@@ -2,13 +2,17 @@ from ..db.neo4j import db
 
 
 class User:
-    def __init__(self, email, nombre, apellido, contraseña, fecha_nacimiento=None, genero=None):
+    def __init__(self, email, nombre, apellido, contraseña, fecha_nacimiento=None, genero=None,
+                 is_authenticated=None, is_active=None, is_anonymous=None):
         self.email = email
         self.nombre = nombre
         self.apellido = apellido
         self.contraseña = contraseña
         self.fecha_nacimiento = fecha_nacimiento
         self.genero = genero
+        self.is_authenticated = is_authenticated
+        self.is_active = is_active
+        self.is_anonymous = is_anonymous
 
     @staticmethod
     def create_user(email, nombre, apellido, contraseña, fecha_nacimiento=None, genero=None):
@@ -20,7 +24,10 @@ class User:
                 apellido: $apellido,
                 contraseña: $contraseña,
                 fecha_nacimiento: $fecha_nacimiento,
-                genero: $genero
+                genero: $genero,
+                is_authenticated: $is_authenticated,
+                is_active:$is_active,
+                is_anonymous:$is_anonymous
             })
             """,
             {
@@ -29,14 +36,17 @@ class User:
                 "apellido": apellido,
                 "contraseña": contraseña,
                 "fecha_nacimiento": fecha_nacimiento,
-                "genero": genero
+                "genero": genero,
+                "is_authenticated": False,
+                "is_active":True,
+                "is_anonymous": False
             }
         )
         return User(email, nombre, apellido, contraseña, fecha_nacimiento, genero)
 
     def get_user(query, value):
         try:
-            result = db.execute_read(
+            result, error = db.execute_read(
                 f"""
                        MATCH (u:User {{{query}: $value}}) 
                        RETURN u.email AS email, u.nombre AS nombre, u.apellido AS apellido, 
@@ -79,7 +89,7 @@ class User:
             return []
 
     @staticmethod
-    def update_user(email,new_nombre, new_apellido, new_contraseña, new_fecha_nacimiento=None,
+    def update_user(email, new_nombre, new_apellido, new_contraseña, new_fecha_nacimiento=None,
                     new_genero=None):
         try:
             db.execute_write(

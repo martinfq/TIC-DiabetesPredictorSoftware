@@ -1,10 +1,11 @@
 from flask import request, jsonify, Blueprint
 from flask_restful import Resource
 from flask_login import login_user, logout_user, LoginManager
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, JWTManager
+from flask_jwt_extended import (create_access_token, jwt_required, get_jwt_identity,
+                                JWTManager, verify_jwt_in_request, get_jwt)
 from ..services.user import User
+from ..services.login_manager import login_manager
 
-login_manager = LoginManager()
 jwt = JWTManager()
 
 auth_bp = Blueprint('auth', __name__)
@@ -15,12 +16,24 @@ def load_user(user_id):
     return User.get_user_by_email(user_id)
 
 
+@login_manager.request_loader
+def load_user_from_request(request):
+    # Extract the JWT token from the header
+    try:
+        verify_jwt_in_request()
+        jwt_data = get_jwt()
+        user_email = jwt_data['sub']['email']
+        return User.get_user_by_email(user_email)
+    except Exception as e:
+        print(f"Error loading user from request: {e}")
+        return None
+
+
 class AuthLogin(Resource):
     def post(self):
         email = request.json.get('email', None)
         contraseña = request.json.get('contraseña', None)
         user = User.get_user_by_email(email)
-
         if user and user.contraseña == contraseña:
             login_user(user)
             access_token = create_access_token(identity={'email': user.email, 'nombre': user.nombre})
