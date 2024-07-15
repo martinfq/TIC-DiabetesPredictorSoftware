@@ -1,18 +1,49 @@
+import re, hashlib
+from datetime import datetime
+
+
 class Usuario:    
-    def __init__(self, fechaNacimiento, genero, nombre, password):
+    def __init__(self, fechaNacimiento, genero, nombre, email, password):
         self.fechaNacimiento = fechaNacimiento
         self.genero = genero
         self.nombre = nombre
+        self.email  = email
         self.password = password
     
-#Minuscula, mayuscula, numero, caracter especial, longitud 8. 
-#Genero M, F
-#Nombre Caracteres 
-#Fecha de nacimiento 
-#Correo, Marshmallow
-    def is_valid():
-        if(fechaNacimiento is None or genero is None or nombre is None  or password is None):
-            return False
+
+    def is_valid(self):
+
+        try:
+            #Email
+            if not re.match("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", self.email):
+                return False
+
+            #Password
+            if not re.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!#@$])[A-Za-z\d!#@$]{8,}$", self.password):
+                return False
+
+            #Nombre
+            if not re.match("^[A-Za-z]+ [A-Za-z]+$", self.nombre):
+                return False
+
+            #Genero
+            self.genero = self.genero.upper()
+            if self.genero != "M" and self.genero != "F":
+                return False
+
+            #Fecha
+            if not re.match("^\d{1,2}/\d{1,2}/\d{4}$", self.fechaNacimiento):
+                return False
+
+            try:
+                datetime.strptime(self.fechaNacimiento, '%d/%m/%Y')
+            except ValueError:
+                return False
+                
+            self.password = hashlib.sha256(self.password.encode()).hexdigest()
+        except Exception as e:
+            return False   
+        
         return True
 
     
@@ -21,5 +52,6 @@ class Usuario:
             "fechaNacimiento" : self.fechaNacimiento,
             "genero" : self.genero,
             "nombre" : self.nombre,
+            "email"  : self.email,
             "password" : self.password
         }

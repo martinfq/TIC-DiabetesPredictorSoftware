@@ -1,9 +1,8 @@
 from flask import Blueprint, request, jsonify
 from database.redis_connection import redis_connection
 import hashlib, uuid, jwt
-from services.prediction_service import predecir_diabetes, cargar_modelo
+from services.prediction_service import predecir_diabetes, cargar_modelo, obtener_predicciones_por_usuario
 from models.caracteristicas_prediccion import CaracteristicasPrediccion
-from services.prediction_service import obtener_predicciones_por_usuario
 from services.user_service import usuario_existe
 
 
@@ -15,70 +14,48 @@ def crear_prediccion():
     #LECTURA DE DATOS DESDE EL QUERY
     token_session = request.headers.get('Authorization')
     data = request.json 
-    highBP = data.get('HighBP')
-    highChol = data.get('HighChol')
-    bmi = data.get('BMI')
-    smoker = data.get('Smoker')
-    stroke = data.get('Stroke')
-    heartDiseaseOrAttack = data.get('HeartDiseaseOrAttack')
-    physActivity = data.get('PhysActivity')
-    genHlth = data.get('GenHlth')
-    mentHlth = data.get('MentHlth')
-    physHlth = data.get('PhysHlth')
-    age = data.get('Age')
+    caracteristicas = CaracteristicasPrediccion(
+        highBP = data.get('HighBP'),
+        highChol = data.get('HighChol'),
+        bmi = data.get('BMI'),
+        smoker = data.get('Smoker'),
+        stroke = data.get('Stroke'),
+        heartDiseaseOrAttack = data.get('HeartDiseaseOrAttack'),
+        physActivity = data.get('PhysActivity'),
+        genHlth = data.get('GenHlth'),
+        mentHlth = data.get('MentHlth'),
+        physHlth = data.get('PhysHlth'),
+        age = data.get('Age')
+    )
 
-    #LECTURA DE DATOS DEL TOKEN DE USUARIO
+    #VALIDACION DEL TOKEN DE SESSION
     if not token_session:
         return jsonify({'ERROR': 'TOKEN FALTANTE'}), 401
 
     try:
         email = jwt.decode(token_session.split(" ")[1], "passPrueba", algorithms=['HS256']).get("email")
 
-        #VALIDAR QUE EL USUARIO EXISTA EN LOS REGISTROS
+        #VALIDACION DE LA EXISTENCIA DEL USUARIO
         if not usuario_existe(email):
             return jsonify({'ERROR': 'USUARIO INEXISTENTE'}), 400
 
-        #VALIDA QUE NINGUNO DE LOS CAMPOS SOLICITADOS SEA NULO
-        if(highBP is None or highChol is None or bmi is None or smoker is None or stroke is None or
-            heartDiseaseOrAttack is None or physActivity is None or genHlth is None or mentHlth is None or
-            physHlth is None or age is None):
+        #VALIDACION DEL DOMINIO DE LOS CAMPOS
+        if not caracteristicas.is_valid():
             return jsonify({'mensaje': 'CUERPO DE LA SOLICITUD INCORRECTO.'}), 400
         
-        #VALIDAR DOMINIO DE LOS CAMPOS
-        
-
-        #Contruir Objeto de Caracteristicas de prediccion
-        caracteristicas = CaracteristicasPrediccion(
-            highBP = data.get('HighBP'),
-            highChol = data.get('HighChol'),
-            bmi = data.get('BMI'),
-            smoker = data.get('Smoker'),
-            stroke = data.get('Stroke'),
-            heartDiseaseOrAttack = data.get('HeartDiseaseOrAttack'),
-            physActivity = data.get('PhysActivity'),
-            genHlth = data.get('GenHlth'),
-            mentHlth = data.get('MentHlth'),
-            physHlth = data.get('PhysHlth'),
-            age = data.get('Age')
-        )
-
-
+        #CARGA DEL MODELO Y GENERACION DE LA PREDICCION
         modelo = cargar_modelo()
         resultado = predecir_diabetes(modelo, caracteristicas)
-
-        #GENERA LA PREDICCION
+      
         if resultado is None:
             return jsonify({'mensaje': 'ERROR AL GENERAR LA PREDICCION'}), 400
 
-        #CONSTRUCCION DEL NUEVO OBJETO
         prediccion = {'estadoPrediccion': str(resultado), 'probabilidad': "%", 'usuario' : email }
 
-        prediccion_id = str(uuid.uuid4())
-        
+        prediccion_id = str(uuid.uuid4())       
         connection = redis_connection()
         connection.hset(f"prediccion:{prediccion_id}", mapping=prediccion) #CREACION DE PREDICCIONES
         connection.sadd("PREDICCIONES", prediccion_id) #Modificar por sets inversos
-
         connection.connection_pool.disconnect()
         
         return jsonify({'mensaje': 'PREDICCION REGISTRADA CON EXITO', 'prediccion': prediccion}), 200
@@ -96,16 +73,14 @@ def obtener_predicciones():
         return jsonify({'ERROR': 'TOKEN FALTANTE'}), 401
 
     try:
-        usuario_id = jwt.decode(token_session.split(" ")[1], "passPrueba", algorithms=['HS256']).get("email")
+        email = jwt.decode(token_session.split(" ")[1], "passPrueba", algorithms=['HS256']).get("email")
+        
         #VALIDAR QUE EL USUARIO EXISTA EN LOS REGISTROS
-        connection = redis_connection()
-        print(usuario_id)
-        if connection.sismember("USUARIOS", usuario_id) == 0:
+        if not usuario_existe(email):
             return jsonify({'ERROR': 'USUARIO INEXISTENTE'}), 400
 
-        connection.connection_pool.disconnect()
-        predicciones = obtener_predicciones_por_usuario(usuario_id)
-
+        predicciones = obtener_predicciones_por_usuario(email)
         return jsonify({'Predicciones': predicciones}), 200
+
     except jwt.InvalidTokenError:
         return jsonify({'ERROR': 'TOKEN INVALIDO'}), 400

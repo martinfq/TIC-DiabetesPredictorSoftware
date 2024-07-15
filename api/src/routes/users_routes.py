@@ -11,33 +11,28 @@ app = Blueprint('users_blueprint', __name__)
 def crear_usuario():
     #LECTURA DE DATOS DESDE EL QUERY
     data = request.json 
-    email = data.get('email')
     nuevo_usuario = Usuario(
         fechaNacimiento = data.get('fechaNacimiento'), 
         genero = data.get('genero'), 
         nombre =  data.get('nombre'), 
+        email = data.get('email'),
         password = data.get('password')
     )
     
-    #VALIDA QUE NO EXISTA EL DOMINIO DE LOS CAMPOS
-    if(email is None or not nuevo_usuario.is_valid):
+    #VALIDACION DEL DOMINIO DE LOS CAMPOS
+    if  not nuevo_usuario.is_valid():
         return jsonify({'mensaje': 'CUERPO DE LA SOLICITUD INCORRECTO.'}), 400
 
-    #VALIDA QUE NO EXISTA UN USUARIO CON ESE CORREO
-    if usuario_existe(email):
+    #VALIDACION PARA ASEGURAR UNICIDAD DE USUARIO
+    if usuario_existe(nuevo_usuario.email):
         return jsonify({'mensaje': 'ERROR. YA EXISTE UN USUARIO CON ESTE CORREO'}), 400
 
     connection = redis_connection()
-
-    nuevo_usuario = nuevo_usuario.data()
-
-    connection.hset(f"usuario:{email}", mapping=nuevo_usuario) #HASH DE USUARIOS
-
-    connection.sadd("USUARIOS", email) #Modificar por sets inversos
-
+    connection.hset(f"usuario:{str(uuid.uuid4())}", mapping=nuevo_usuario.data())
+    connection.sadd("USUARIOS", nuevo_usuario.email)
     connection.connection_pool.disconnect()
     
-    return jsonify({'mensaje': 'Usuario creado correctamente', 'usuario': nuevo_usuario}), 200
+    return jsonify({'mensaje': 'Usuario creado correctamente'}), 200
 
 
 @app.route('/login', methods=['POST'])
@@ -46,18 +41,15 @@ def login():
     email = data.get('email')
     password = data.get('password')
     
-    if(email is None or password is None):
+    if email is None or password is None:
         return jsonify({'mensaje': 'CREDENCIALES INCORRECTAS.'}), 400
 
-    if(not usuario_existe(email) or not validar_credenciales(email, password)):
+    if not usuario_existe(email) or not validar_credenciales(email, password):
         return jsonify({'mensaje': 'CREDENCIALES INCORRECTAS.'}), 400
 
 
     #CREACION DEL TOKEN DE USUARIO
-    payload = {
-        'email': email, 
-    }
-    token_session = jwt.encode(payload, "passPrueba", algorithm='HS256')
+    token_session = jwt.encode({'email': email}, "passPrueba", algorithm='HS256')
 
     return jsonify({'token_session': token_session}), 200
 
