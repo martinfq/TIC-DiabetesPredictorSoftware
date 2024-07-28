@@ -2,24 +2,46 @@ def validate_prediction_input(data):
     required_fields = ['correo', 'BP', 'Chol', 'BMI', 'Smoker', 'Stroke', 'HDA', 'PA', 'GH', 'MH', 'PH', 'Age']
     errors = []
 
+    # Verifica que los campos no esten vacios
     for field in required_fields:
         if field not in data:
             errors.append(f'El campo {field} es requerido.')
 
-    # Validaciones adicionales, como tipos de datos o rangos específicos
+    # Verifica el contenido de cada campo
     if 'correo' in data and not isinstance(data['correo'], str):
         errors.append('El correo debe ser una cadena de texto.')
 
-    # if 'colesterol' in data and not isinstance(data['colesterol'], (int, float)):
-    #     errors.append('El colesterol debe ser un número.')
+    if 'BP' in data and (not isinstance(data['BP'], int) or (data['BP']!=0 and data['BP']!=1)):
+        errors.append('El BP debe ser un número.')
 
-    # if 'edad' in data and not isinstance(data['edad'], int):
-    #     errors.append('La edad debe ser un número entero.')
+    if 'Chol' in data and (not isinstance(data['Chol'], int) or (data['Chol']!=0 and data['Chol']!=1)):
+        errors.append('El Chol debe ser un número.')
+    
+    if 'BMI' in data and (not isinstance(data['BMI'], int) or data['BMI']<10):
+        errors.append('El BMI debe ser un número.')
+    
+    if 'Smoker' in data and (not isinstance(data['Smoker'], int) or (data['Smoker']!=0 and data['Smoker']!=1)):
+        errors.append('El Smoker debe ser un número.')
 
-    # if 'salud_fisica' in data and not isinstance(data['salud_fisica'], (int, float)):
-    #     errors.append('La salud física debe ser un número.')
+    if 'Stroke' in data and (not isinstance(data['Stroke'], int) or (data['Stroke']!=0 and data['Stroke']!=1)):
+        errors.append('El Stroke debe ser un número.')
 
-    # if 'salud_mental' in data and not isinstance(data['salud_mental'], (int, float)):
-    #     errors.append('La salud mental debe ser un número.')
+    if 'HDA' in data and (not isinstance(data['HDA'], int) or (data['HDA']!=0 and data['HDA']!=1)):
+        errors.append('El HDA debe ser un número.')
+
+    if 'PA' in data and (not isinstance(data['PA'], int) or (data['PA']!=0 and data['PA']!=1)):
+        errors.append('El PA debe ser un número.')
+
+    if 'GH' in data and (not isinstance(data['GH'], int) or (data['GH']<0 and data['GH']>30)):
+        errors.append('El GH debe ser un número.')
+
+    if 'MH' in data and (not isinstance(data['MH'], int) or (data['MH']<0 and data['MH']>30)):
+        errors.append('El MH debe ser un número.')
+
+    if 'PH' in data and (not isinstance(data['PH'], int) or (data['PH']<0 and data['PH']>30)):
+        errors.append('El PH debe ser un número.')
+
+    if 'Age' in data and not isinstance(data['Age'], (int, float)):
+        errors.append('El Age debe ser un número.')
 
     return errors if errors else None

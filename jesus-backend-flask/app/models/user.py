@@ -1,4 +1,4 @@
-import re
+import re, hashlib
 from app import mongo
 from werkzeug.security import generate_password_hash, check_password_hash
 from pymongo.errors import PyMongoError, DuplicateKeyError
@@ -9,19 +9,10 @@ class User:
         self.nombre = nombre
         self.apellido = apellido
         self.correo = correo
-        self.contrasena = self.set_password(contrasena)
+        self.contrasena = contrasena
         self.genero = genero
         self.fecha_nacimiento = fecha_nacimiento
         self.edad = None
-
-    def set_password(self, password):
-        if self.validate_password(password):
-            return generate_password_hash(password)
-        else:
-            raise ValueError("La contraseña no cumple con los requisitos de seguridad.")
-
-    def check_password(self, password):
-        return check_password_hash(self.contrasena, password)
     
 
     def save(self):
@@ -30,7 +21,7 @@ class User:
                 'nombre': self.nombre,
                 'apellido': self.apellido,
                 'correo': self.correo,
-                'contrasena': self.contrasena,
+                'contrasena': generate_password_hash(self.contrasena),
                 'genero': self.genero,
                 'fecha_nacimiento': self.fecha_nacimiento,
                 'edad': self.calculateAge(self.fecha_nacimiento)
@@ -38,9 +29,6 @@ class User:
             user_created = mongo.db.user.insert_one(user_data)
             mongo.db.user.create_index([('correo', 1)], unique=True)
             return user_created
-        except DuplicateKeyError:
-            print(f"Error: El correo '{self.correo}' ya está registrado.")
-            return None
         except PyMongoError as e:
             print(f"Error al crear un usuario: {e}")
             return None
@@ -104,13 +92,3 @@ class User:
         except PyMongoError as e:
             print(f"Error en el calculo de edad: {e}")
             return False
-        
-    @staticmethod
-    def validate_email(correo):
-        email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-        return re.match(email_regex, correo) is not None
-
-    @staticmethod
-    def validate_password(contraseña):
-        password_regex = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
-        return re.match(password_regex, contraseña) is not None

@@ -1,14 +1,21 @@
-BACK
-ENTORNO VIRTUAL
-• python -m venv venv
-• .\venv\Scripts\activate
+# BACK
 
-INSTALACION
-• pip install flask Flask-PyMongo Flask-WTF
-• python -m pip install "pymongo[srv]"
+## ENTORNO VIRTUAL
 
-EXEC
+.\venv\Scripts\activate
+
+## EJECUTAR
+
+### VENV
+
 python run.py
 
-FINALIZAR
+### MONGO DB
+
+cd \
+C:
+mongod
+
+## FINALIZAR
+
 deactivate

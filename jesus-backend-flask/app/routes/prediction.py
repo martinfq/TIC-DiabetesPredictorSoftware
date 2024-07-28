@@ -10,9 +10,9 @@ prediction_bp = Blueprint('prediction', __name__)
 def add_prediction():
     try:
         data = request.get_json()
+
+        # Validar datos de entrada
         error = validate_prediction_input(data)
-        if data is None:
-            return jsonify({"error": "Invalid JSON"}), 400
         if error:
             return jsonify({'error': error}), 400
     
