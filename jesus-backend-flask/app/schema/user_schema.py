@@ -1,7 +1,28 @@
 import re
 from app.models.user import User
 from app import mongo
+from werkzeug.security import check_password_hash
 
+
+def validate_login(data):
+    required_fields = ['correo', 'contrasena']
+    errors = []
+
+    # Verifica que los campos no esten vacios
+    for field in required_fields:
+        if field not in data or not isinstance(data[field], str):
+            errors.append(f'{field.capitalize()} es requerido')
+    
+    # Verifica el contenido de cada campo
+    if 'correo' in data and not mongo.db.user.find_one({'correo': data['correo']}):
+        errors.append(f"El usuario '{data['correo']}' no está registrado.")
+
+
+    if 'correo' in data and mongo.db.user.find_one({'correo': data['correo']}):
+        if not check_password_hash(mongo.db.user.find_one({'correo': data['correo']})['contrasena'], data['contrasena']):
+            errors.append(f"Credencianos no validas")
+
+    return errors if errors else None
 
 
 def validate_user(data):
@@ -11,7 +32,7 @@ def validate_user(data):
     # Verifica que los campos no esten vacios
     for field in required_fields:
         if field not in data or not isinstance(data[field], str):
-            errors.append(f'{field.capitalize()} is required and must be a string')
+            errors.append(f'{field.capitalize()} is required')
     
     # Verifica el contenido de cada campo
     if 'nombre' in data and not validate_nombreApellido(data['nombre']):
@@ -30,7 +51,7 @@ def validate_user(data):
         errors.append('El genero debe ser una M o F.')
 
     if 'fecha_nacimiento' in data and not validate_fecha(data['fecha_nacimiento']):
-        errors.append('ELa fecha es incorrecta.')
+        errors.append('La fecha es incorrecta.')
         
     # Verificar si el correo ya está registrado en la base de datos
     if 'correo' in data and mongo.db.user.find_one({'correo': data['correo']}):
@@ -61,5 +82,7 @@ def validate_genero(genero):
 
 
 def validate_fecha(fecha):
-    password_regex = r'^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/\d{4}$'
+    # r'^(\d{4}\/(0[1-9]|[12][0-9]|3[01])\/0[1-9]|1[0-2])$'
+    password_regex = r'^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})$'
     return re.match(password_regex, fecha) is not None
+    

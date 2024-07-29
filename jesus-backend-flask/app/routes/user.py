@@ -1,6 +1,7 @@
+import jwt
 from flask import Blueprint, jsonify, request
 from app.models.user import User
-from app.schema.user_schema import validate_user
+from app.schema.user_schema import validate_user, validate_login
 
 user_bp = Blueprint('user', __name__)
 
@@ -27,6 +28,24 @@ def add_user():
         return jsonify({'message': 'Usuario creado correctamente'}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+#============================ USUARIO: LOG IN ============================#
+
+@user_bp.route('/login', methods=['POST'])
+def login():
+    data = request.json
+
+    correo = data.get('correo')
+    contrasena = data.get('contrasena')
+    
+    error = validate_login(data)
+    if error:
+        return jsonify({'error': error}), 400
+
+    #CREACION DEL TOKEN DE USUARIO
+    token_session = jwt.encode({'correo': correo}, "passPrueba", algorithm='HS256')
+    return jsonify({'token_session': token_session}), 200
+
 
 #============================ USUARIO: GET ALL ============================#
 @user_bp.route("/usuarios", methods=["GET"])

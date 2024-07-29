@@ -1,5 +1,5 @@
 def validate_prediction_input(data):
-    required_fields = ['correo', 'BP', 'Chol', 'BMI', 'Smoker', 'Stroke', 'HDA', 'PA', 'GH', 'MH', 'PH', 'Age']
+    required_fields = ['BP', 'Chol', 'BMI', 'Smoker', 'Stroke', 'HDA', 'PA', 'GH', 'MH', 'PH']
     errors = []
 
     # Verifica que los campos no esten vacios
@@ -8,8 +8,6 @@ def validate_prediction_input(data):
             errors.append(f'El campo {field} es requerido.')
 
     # Verifica el contenido de cada campo
-    if 'correo' in data and not isinstance(data['correo'], str):
-        errors.append('El correo debe ser una cadena de texto.')
 
     if 'BP' in data and (not isinstance(data['BP'], int) or (data['BP']!=0 and data['BP']!=1)):
         errors.append('El BP debe ser un número.')
@@ -40,8 +38,5 @@ def validate_prediction_input(data):
 
     if 'PH' in data and (not isinstance(data['PH'], int) or (data['PH']<0 and data['PH']>30)):
         errors.append('El PH debe ser un número.')
-
-    if 'Age' in data and not isinstance(data['Age'], (int, float)):
-        errors.append('El Age debe ser un número.')
 
     return errors if errors else None
