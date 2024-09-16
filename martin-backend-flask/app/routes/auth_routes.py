@@ -32,11 +32,11 @@ def load_user_from_request(request):
 class AuthLogin(Resource):
     def post(self):
         email = request.json.get('email', None)
-        contraseña = request.json.get('contraseña', None)
+        password = request.json.get('password', None)
         user = User.get_user_by_email(email)
-        if user and user.contraseña == contraseña:
+        if user and user.password == password:
             login_user(user)
-            access_token = create_access_token(identity={'email': user.email, 'nombre': user.nombre})
+            access_token = create_access_token(identity={'email': user.email})
             return jsonify(access_token=access_token), 200
         return jsonify({"msg": "Bad email or password"}), 401
 

@@ -2,29 +2,29 @@ from ..db.neo4j import db
 
 
 class User:
-    def __init__(self, email, nombre, apellido, contraseña, fecha_nacimiento=None, genero=None,
+    def __init__(self, email, name, last_name, password, birthday=None, gender=None,
                  is_authenticated=None, is_active=None, is_anonymous=None):
         self.email = email
-        self.nombre = nombre
-        self.apellido = apellido
-        self.contraseña = contraseña
-        self.fecha_nacimiento = fecha_nacimiento
-        self.genero = genero
+        self.name = name
+        self.last_name = last_name
+        self.password = password
+        self.birthday = birthday
+        self.gender = gender
         self.is_authenticated = is_authenticated
         self.is_active = is_active
         self.is_anonymous = is_anonymous
 
     @staticmethod
-    def create_user(email, nombre, apellido, contraseña, fecha_nacimiento=None, genero=None):
+    def create_user(email, name, last_name, password, birthday=None, gender=None):
         db.execute_write(
             """
             CREATE (u:User {
                 email: $email,
-                nombre: $nombre,
-                apellido: $apellido,
-                contraseña: $contraseña,
-                fecha_nacimiento: $fecha_nacimiento,
-                genero: $genero,
+                name: $name,
+                last_name: $last_name,
+                password: $password,
+                birthday: $birthday,
+                gender: $gender,
                 is_authenticated: $is_authenticated,
                 is_active:$is_active,
                 is_anonymous:$is_anonymous
@@ -32,32 +32,32 @@ class User:
             """,
             {
                 "email": email,
-                "nombre": nombre,
-                "apellido": apellido,
-                "contraseña": contraseña,
-                "fecha_nacimiento": fecha_nacimiento,
-                "genero": genero,
+                "name": name,
+                "last_name": last_name,
+                "password": password,
+                "birthday": birthday,
+                "gender": gender,
                 "is_authenticated": False,
                 "is_active":True,
                 "is_anonymous": False
             }
         )
-        return User(email, nombre, apellido, contraseña, fecha_nacimiento, genero)
+        return User(email, name, last_name, password, birthday, gender)
 
     def get_user(query, value):
         try:
             result, error = db.execute_read(
                 f"""
                        MATCH (u:User {{{query}: $value}}) 
-                       RETURN u.email AS email, u.nombre AS nombre, u.apellido AS apellido, 
-                              u.contraseña AS contraseña, u.fecha_nacimiento AS fecha_nacimiento, u.genero AS genero
+                       RETURN u.email AS email, u.name AS name, u.last_name AS last_name, 
+                              u.password AS password, u.birthday AS birthday, u.gender AS gender
                        """,
                 {"value": value}
             )
             if result:
                 record = result[0]
-                return User(record["email"], record["nombre"], record["apellido"],
-                            record["contraseña"], record["fecha_nacimiento"], record["genero"])
+                return User(record["email"], record["name"], record["last_name"],
+                            record["password"], record["birthday"], record["gender"])
             return None
         except Exception as e:
             print(f"Error al obtener el usuario: {e}")
@@ -73,15 +73,15 @@ class User:
             results, error = db.execute_read(
                 """
                 MATCH (u:User)
-                RETURN u.email AS email, u.nombre AS nombre, u.apellido AS apellido, 
-                       u.contraseña AS contraseña, u.fecha_nacimiento AS fecha_nacimiento, u.genero AS genero
+                RETURN u.email AS email, u.name AS name, u.last_name AS last_name, 
+                       u.password AS password, u.birthday AS birthday, u.gender AS gender
                 """
             )
             users = []
             for record in results:
                 users.append(User(
-                    record["email"], record["nombre"], record["apellido"],
-                    record["contraseña"], record["fecha_nacimiento"], record["genero"]
+                    record["email"], record["name"], record["last_name"],
+                    record["password"], record["birthday"], record["gender"]
                 ))
             return users
         except Exception as e:
@@ -89,24 +89,24 @@ class User:
             return []
 
     @staticmethod
-    def update_user(email, new_nombre, new_apellido, new_contraseña, new_fecha_nacimiento=None,
-                    new_genero=None):
+    def update_user(email, new_name, new_last_name, new_password, new_birthday=None,
+                    new_gender=None):
         try:
             db.execute_write(
                 """
                 MATCH (u:User {email: $email})
-                SET u.nombre = $new_nombre,
-                    u.apellido = $new_apellido,
-                    u.contraseña = $new_contraseña,
-                    u.fecha_nacimiento = $new_fecha_nacimiento,
-                    u.genero = $new_genero
+                SET u.name = $new_name,
+                    u.last_name = $new_last_name,
+                    u.password = $new_password,
+                    u.birthday = $new_birthday,
+                    u.gender = $new_gender
                 """,
                 {
-                    "new_nombre": new_nombre,
-                    "new_apellido": new_apellido,
-                    "new_contraseña": new_contraseña,
-                    "new_fecha_nacimiento": new_fecha_nacimiento,
-                    "new_genero": new_genero
+                    "name": new_name,
+                    "new_last_name": new_last_name,
+                    "new_password": new_password,
+                    "new_birthday": new_birthday,
+                    "new_gender": new_gender
                 }
             )
             return User.get_user_by_email(email)

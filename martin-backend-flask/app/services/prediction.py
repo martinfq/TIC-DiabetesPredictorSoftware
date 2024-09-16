@@ -87,7 +87,7 @@ class Prediction:
         query = """
             MATCH (u:User {email: $email})
             MATCH (p:Prediction {user_email: $email})
-            CREATE (u)-[:TIENE {fecha: timestamp()}]->(p)
+            CREATE (u)-[:HAVE {fecha: timestamp()}]->(p)
               """
         parameters = {
             "email": user_email,

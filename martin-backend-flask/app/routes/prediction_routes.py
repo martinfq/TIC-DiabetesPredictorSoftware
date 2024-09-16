@@ -4,6 +4,7 @@ from ..services.predition_service import process_data
 from .schemas.prediction_schema import PredictionSchema
 from marshmallow import ValidationError
 from ..services.prediction import Prediction
+from flask_jwt_extended import (jwt_required)
 
 data_blueprint = Blueprint('data', __name__)
 api = Api(data_blueprint)
@@ -21,6 +22,7 @@ class DataModel(Resource):
 
 
 class RegisterPrediction(Resource):
+    @jwt_required()
     def post(self):
         json_data = request.get_json()
         prediction_schema = PredictionSchema()

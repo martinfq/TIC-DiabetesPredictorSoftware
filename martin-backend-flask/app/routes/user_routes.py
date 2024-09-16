@@ -4,6 +4,8 @@ from marshmallow import ValidationError
 from ..services.user import User
 from .schemas.user_schema import UserSchema
 
+from flask_jwt_extended import (jwt_required)
+
 user_blueprint = Blueprint('user', __name__)
 api = Api(user_blueprint)
 
@@ -12,6 +14,7 @@ user_update_schema = UserSchema(partial=True)
 
 
 class Users(Resource):
+    @jwt_required()
     def get(self):
         try:
             users = User.get_all_users()
@@ -35,11 +38,11 @@ class RegisterUser(Resource):
 
         user = User.create_user(
             email=data['email'],
-            nombre=data['nombre'],
-            apellido=data['apellido'],
-            contraseña=data['contraseña'],
-            fecha_nacimiento=data.get('fecha_nacimiento'),
-            genero=data.get('genero')
+            name=data['name'],
+            last_name=data['last_name'],
+            password=data['password'],
+            birthday=data.get('birthday'),
+            gender=data.get('gender')
         )
         return {"email": user.email, "message": "User created successfully"}, 201
 
@@ -64,11 +67,11 @@ class UpdateUser(Resource):
         try:
             updated_user = User.update_user(
                 args.get('email'),
-                args.get('nombre'),
-                args.get('apellido'),
-                args.get('contraseña'),
-                args.get('fecha_nacimiento'),
-                args.get('genero')
+                args.get('name'),
+                args.get('last_name'),
+                args.get('password'),
+                args.get('birthday'),
+                args.get('gender')
             )
             if updated_user:
                 return jsonify(updated_user.__dict__)

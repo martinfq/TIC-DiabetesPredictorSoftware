@@ -3,12 +3,11 @@ from marshmallow import Schema, fields, validate
 
 class UserSchema(Schema):
     email = fields.Email(required=True)
-    nombre = fields.Str(required=True, validate=validate.Length(min=1))
-    apellido = fields.Str(required=True, validate=validate.Length(min=1))
-    contraseña = fields.Str(required=True, validate=validate.Length(min=6))
-    fecha_nacimiento = fields.Date(required=False)
-    genero = fields.Str(required=False,
-                        validate=validate.OneOf(['male', 'female', 'other']))  # Ejemplo de validación de género
-
+    name = fields.Str(required=True, validate=validate.Length(min=1))
+    last_name = fields.Str(required=True, validate=validate.Length(min=1))
+    password = fields.Str(required=True, validate=validate.Length(min=6))
+    birthday = fields.Date(required=False)
+    gender = fields.Str(required=False,
+                        validate=validate.OneOf(['male', 'female', 'other']))
 
 # user_schema = UserSchema()
