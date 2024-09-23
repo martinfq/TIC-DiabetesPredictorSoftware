@@ -31,7 +31,7 @@ class RegisterPrediction(Resource):
         except ValidationError as err:
             return {"errors": err.messages}, 400
 
-        Prediction.create_prediction(
+        prediction = Prediction.create_prediction(
             user_email=data['user_email'],
             high_bp=data['HighBp'],
             high_chol=data['HighChol'],
@@ -45,8 +45,18 @@ class RegisterPrediction(Resource):
             phys_hlth=data['PhysHlth'],
             age=data['Age']
         )
-        return {"message": "Prediction created successfully"}, 201
+        return {"prediction": prediction}, 201
+
+
+class GetPredictionByEmail(Resource):
+    def get(self, email):
+        prediction = Prediction.get_user_predictions(email)
+        if prediction:
+            return {"predictions": prediction}, 200
+        else:
+            return {"message": "User not found or error occurred"}, 404
 
 
 api.add_resource(DataModel, '/model')
 api.add_resource(RegisterPrediction, '/predict/register')
+api.add_resource(GetPredictionByEmail, '/predict/email/<email>')

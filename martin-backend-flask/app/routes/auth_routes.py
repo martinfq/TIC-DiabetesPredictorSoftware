@@ -34,11 +34,13 @@ class AuthLogin(Resource):
         email = request.json.get('email', None)
         password = request.json.get('password', None)
         user = User.get_user_by_email(email)
-        if user and user.password == password:
+        if not user:
+            return jsonify({"msg": "User not found"}), 404
+        if user.password == password:
             login_user(user)
             access_token = create_access_token(identity={'email': user.email})
             return jsonify(access_token=access_token), 200
-        return jsonify({"msg": "Bad email or password"}), 401
+        return jsonify({"msg": "Bad email or password"}), 400
 
 
 class AuthLogout(Resource):

@@ -34,7 +34,7 @@ class RegisterUser(Resource):
 
         existing_user = User.get_user_by_email(data['email'])
         if existing_user:
-            return {"message": "User already exists"}, 400
+            return {"message": "User already exists"}, 409
 
         user = User.create_user(
             email=data['email'],

@@ -94,8 +94,25 @@ class Prediction:
         }
         db.execute_write(query, parameters)
 
-        return Prediction(next_id,
-                          high_bp, high_chol, bmi, smoker, stroke,
-                          heart_disease_or_attack, phys_activity, gen_hlth,
-                          ment_hlth, phys_hlth, age
-                          )
+        return prediction
+        # return Prediction(next_id,
+        #                   high_bp, high_chol, bmi, smoker, stroke,
+        #                   heart_disease_or_attack, phys_activity, gen_hlth,
+        #                   ment_hlth, phys_hlth, age
+        #                   )
+
+    @staticmethod
+    def get_user_predictions(user_email):
+        query = """
+        MATCH (u:User)-[:HAVE]->(p:Prediction)
+        WHERE u.email = $email
+        RETURN p
+        """
+        parameters = {"email": user_email}
+        result, code = db.execute_read(query, parameters)
+
+        predictions = []
+        for record in result:
+            predictions.append(record['p'].get('Prediction'))
+
+        return predictions
