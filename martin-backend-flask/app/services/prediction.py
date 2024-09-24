@@ -1,13 +1,13 @@
 from ..db.neo4j import db
 from .predition_service import process_data
 from .models import ModeloML
+from .user import User
 
 
 class Prediction:
 
-    def __init__(self, id, high_bp, high_chol, bmi, smoker, stroke, heart_disease_or_attack, phys_activity, gen_hlth,
+    def __init__(self, high_bp, high_chol, bmi, smoker, stroke, heart_disease_or_attack, phys_activity, gen_hlth,
                  ment_hlth, phys_hlth, age):
-        self.id = id
         self.HighBp = high_bp
         self.HighChol = high_chol
         self.BMI = bmi
@@ -23,7 +23,7 @@ class Prediction:
     @staticmethod
     def create_prediction(user_email, high_bp, high_chol, bmi, smoker, stroke, heart_disease_or_attack, phys_activity,
                           gen_hlth,
-                          ment_hlth, phys_hlth, age):
+                          ment_hlth, phys_hlth):
         # Convertir todos los parámetros a floats
         high_bp = float(high_bp)
         high_chol = float(high_chol)
@@ -35,24 +35,24 @@ class Prediction:
         gen_hlth = float(gen_hlth)
         ment_hlth = float(ment_hlth)
         phys_hlth = float(phys_hlth)
-        age = float(age)
 
-        # Crear la lista de floats
+        #Obtener age
+        user_age = float(User.get_user_age(user_email))
+
         data = [
             high_bp, high_chol, bmi, smoker, stroke, heart_disease_or_attack, phys_activity, gen_hlth, ment_hlth,
-            phys_hlth, age
+            phys_hlth, user_age
         ]
         modelo = ModeloML('model.pkl')
         predict, error = modelo.predecir2(data)
         prediction = float(predict[0])
 
-        next_id = db.get_next_id()
+        # next_id = db.get_next_id()
 
         db.execute_write(
             """
             CREATE (p:Prediction {
                 user_email:$user_email,
-                id: $id,
                 HighBp: $high_bp,
                 HighChol: $high_chol,
                 BMI: $bmi,
@@ -69,7 +69,6 @@ class Prediction:
             """,
             {
                 "user_email": user_email,
-                "id": next_id,
                 "high_bp": high_bp,
                 "high_chol": high_chol,
                 "bmi": bmi,
@@ -80,7 +79,7 @@ class Prediction:
                 "gen_hlth": gen_hlth,
                 "ment_hlth": ment_hlth,
                 "phys_hlth": phys_hlth,
-                "age": age,
+                "age": user_age,
                 "prediction": prediction
             }
         )

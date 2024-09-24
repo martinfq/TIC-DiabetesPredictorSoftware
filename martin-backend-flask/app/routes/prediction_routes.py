@@ -4,8 +4,7 @@ from ..services.predition_service import process_data
 from .schemas.prediction_schema import PredictionSchema
 from marshmallow import ValidationError
 from ..services.prediction import Prediction
-from flask_jwt_extended import (jwt_required)
-
+from flask_jwt_extended import (jwt_required, decode_token)
 data_blueprint = Blueprint('data', __name__)
 api = Api(data_blueprint)
 
@@ -24,15 +23,24 @@ class DataModel(Resource):
 class RegisterPrediction(Resource):
     @jwt_required()
     def post(self):
+        # Obtener el token JWT y decodificarlo
+        token = request.headers.get('Authorization').split()[1]
+        decoded_token = decode_token(token)
+        user_email_from_token = decoded_token.get(
+            'sub').get('email')
+
+        # Obtener los datos del cuerpo de la solicitud
         json_data = request.get_json()
         prediction_schema = PredictionSchema()
+
         try:
+            # Validar y cargar los datos
             data = prediction_schema.load(json_data)
         except ValidationError as err:
             return {"errors": err.messages}, 400
 
         prediction = Prediction.create_prediction(
-            user_email=data['user_email'],
+            user_email=user_email_from_token,  # Usar el email decodificado del token
             high_bp=data['HighBp'],
             high_chol=data['HighChol'],
             bmi=data['BMI'],
@@ -43,8 +51,9 @@ class RegisterPrediction(Resource):
             gen_hlth=data['GenHlth'],
             ment_hlth=data['MentHlth'],
             phys_hlth=data['PhysHlth'],
-            age=data['Age']
         )
+
+        # Retornar la predicción creada
         return {"prediction": prediction}, 201
 
 

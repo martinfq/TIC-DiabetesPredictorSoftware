@@ -2,7 +2,6 @@ from marshmallow import Schema, fields, validate
 
 
 class PredictionSchema(Schema):
-    user_email = fields.Email(required=True)
     HighBp = fields.Float(required=True)
     HighChol = fields.Float(required=True)
     BMI = fields.Float(required=True)
@@ -13,6 +12,4 @@ class PredictionSchema(Schema):
     GenHlth = fields.Float(required=True)
     MentHlth = fields.Float(required=True)
     PhysHlth = fields.Float(required=True)
-    Age = fields.Float(required=True)
-    Prediction = fields.Float(required=False)
 

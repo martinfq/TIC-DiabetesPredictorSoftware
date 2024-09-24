@@ -51,7 +51,7 @@ class GetUserByEmail(Resource):
     def get(self, email):
         user = User.get_user_by_email(email)
         if user:
-            return {"email": user.email}, 200
+            return {"email": user.email, "edad": user.age}, 200
         else:
             return {"message": "User not found or error occurred"}, 404
 

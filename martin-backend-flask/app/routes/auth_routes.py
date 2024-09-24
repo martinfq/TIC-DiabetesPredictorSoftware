@@ -1,13 +1,16 @@
 from flask import request, jsonify, Blueprint
 from flask_restful import Resource
-from flask_login import login_user, logout_user, LoginManager
-from flask_jwt_extended import (create_access_token, jwt_required, get_jwt_identity,
+from marshmallow import ValidationError
+from flask_login import logout_user, LoginManager
+from flask_jwt_extended import (jwt_required, get_jwt_identity,
                                 JWTManager, verify_jwt_in_request, get_jwt)
+from .schemas.login_schema import LoginSchema
 from ..services.user import User
+from ..services.auth import Auth, UserNotFoundError
 from ..services.login_manager import login_manager
 
 jwt = JWTManager()
-
+login_schema = LoginSchema()
 auth_bp = Blueprint('auth', __name__)
 
 
@@ -18,7 +21,6 @@ def load_user(user_id):
 
 @login_manager.request_loader
 def load_user_from_request(request):
-    # Extract the JWT token from the header
     try:
         verify_jwt_in_request()
         jwt_data = get_jwt()
@@ -31,16 +33,22 @@ def load_user_from_request(request):
 
 class AuthLogin(Resource):
     def post(self):
-        email = request.json.get('email', None)
-        password = request.json.get('password', None)
-        user = User.get_user_by_email(email)
-        if not user:
-            return jsonify({"msg": "User not found"}), 404
-        if user.password == password:
-            login_user(user)
-            access_token = create_access_token(identity={'email': user.email})
-            return jsonify(access_token=access_token), 200
-        return jsonify({"msg": "Bad email or password"}), 400
+        json_data = request.get_json()
+        try:
+            data = login_schema.load(json_data)
+        except ValidationError as err:
+            return {"errors": err.messages}, 400
+        try:
+            access_token = Auth.login(
+                email=data['email'],
+                password=data['password']
+            )
+        except UserNotFoundError as e:
+            return jsonify({"msg": str(e)}), 404  # Usuario no encontrado
+        except ValueError as e:
+            return jsonify({"msg": str(e)}), 401  # Error de autenticación
+
+        return jsonify(access_token=access_token), 200
 
 
 class AuthLogout(Resource):
