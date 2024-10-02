@@ -1,8 +1,6 @@
-import re, hashlib
 from app import mongo
-from werkzeug.security import generate_password_hash, check_password_hash
-from pymongo.errors import PyMongoError, DuplicateKeyError
-import datetime
+from pymongo.errors import PyMongoError
+from app.services.user_services import calculateAge
 
 class User:
     def __init__(self, nombre, apellido, correo, contrasena, genero, fecha_nacimiento):
@@ -13,25 +11,6 @@ class User:
         self.genero = genero
         self.fecha_nacimiento = fecha_nacimiento
         self.edad = None
-    
-
-    def save(self):
-        try:
-            user_data = {
-                'nombre': self.nombre,
-                'apellido': self.apellido,
-                'correo': self.correo,
-                'contrasena': generate_password_hash(self.contrasena),
-                'genero': self.genero,
-                'fecha_nacimiento': self.fecha_nacimiento,
-                'edad': self.calculateAge(self.fecha_nacimiento)
-            }
-            user_created = mongo.db.user.insert_one(user_data)
-            mongo.db.user.create_index([('correo', 1)], unique=True)
-            return user_created
-        except PyMongoError as e:
-            print(f"Error al crear un usuario: {e}")
-            return None
 
     @staticmethod
     def find_all():
@@ -61,13 +40,13 @@ class User:
         try:
             update_fields = {k: v for k, v in data.items() if k != "password"}
             if "fecha_nacimiento" in data:
-                update_fields["edad"] = User.calculateAge(data['fecha_nacimiento'])
+                update_fields["edad"] = calculateAge(data['fecha_nacimiento'])
             if "password" in data:
                 update_fields["password"] = User.generate_password_hash(data['password'])
 
             result = mongo.db.user.update_one(
                 {"correo": user_correo},
-                {"$set": data}
+                {"$set": update_fields}
             )
             return result
         except PyMongoError as e:
@@ -80,15 +59,4 @@ class User:
             return mongo.db.user.delete_one({"correo": user_correo})
         except PyMongoError as e:
             print(f"Error al eliminar usuario: {e}")
-            return False
-    
-    @staticmethod
-    def calculateAge(fecha_nacimiento):
-        try:
-            today = datetime.date.today()
-            birth_date = datetime.datetime.strptime(fecha_nacimiento, '%Y-%m-%d').date()
-            age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
-            return age
-        except PyMongoError as e:
-            print(f"Error en el calculo de edad: {e}")
             return False

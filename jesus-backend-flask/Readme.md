@@ -16,6 +16,10 @@ cd \
 C:
 mongod
 
+### FRONT
+
+npm run dev
+
 ## FINALIZAR
 
 deactivate

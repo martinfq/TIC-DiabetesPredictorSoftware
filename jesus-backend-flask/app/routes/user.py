@@ -2,6 +2,7 @@ import jwt
 from flask import Blueprint, jsonify, request
 from app.models.user import User
 from app.schema.user_schema import validate_user, validate_login
+from app.services.user_services import save_user
 
 user_bp = Blueprint('user', __name__)
 
@@ -24,7 +25,7 @@ def add_user():
             genero=data['genero'],
             fecha_nacimiento=data['fecha_nacimiento']
         )
-        user.save()
+        save_user(user)
         return jsonify({'message': 'Usuario creado correctamente'}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500

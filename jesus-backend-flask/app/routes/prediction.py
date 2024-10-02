@@ -3,11 +3,12 @@ from flask import Blueprint, jsonify, request
 from app.models.prediction import Modelo
 from app.schema.prediction_schema import validate_prediction_input
 from app.models.user import User
+from app.services.prediction_services import save_predicition, predict_diabetes, load_model
 
 
 prediction_bp = Blueprint('prediction', __name__)
 
-#============================ PREDICCION: POST ============================#
+#============================ PREDICCION: POST ============================# /predict/create
 @prediction_bp.route("/guardar/predicciones", methods=["POST"])
 def add_prediction():
     try:
@@ -42,11 +43,13 @@ def add_prediction():
             Age=edadUser,
         )
 
-        prediction.predict()
-        result = prediction.save_predicition()
+        model_loaded = load_model()
+        predict_diabetes(model_loaded, prediction)
+        save_predicition(prediction)
+
         return jsonify({
             'message': "Prediction added successfully",
-            '_id': str(result.inserted_id),
+            # '_id': result,
             'usuario': correoUser,
             'edad': edadUser,
             'prediccion': prediction.rPrediccion
