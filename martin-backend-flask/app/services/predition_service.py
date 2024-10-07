@@ -1,7 +1,7 @@
 from ..services.models import ModeloML
 
-modelo = ModeloML('model.pkl')
+modelo = ModeloML('modelANN.pkl', 'scalerANN.pkl')
 
 
 def process_data(data):
-    return modelo.predecir(data)
+    return modelo.predecir_ann(data)

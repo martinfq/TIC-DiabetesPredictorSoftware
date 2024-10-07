@@ -43,9 +43,11 @@ class Prediction:
             high_bp, high_chol, bmi, smoker, stroke, heart_disease_or_attack, phys_activity, gen_hlth, ment_hlth,
             phys_hlth, user_age
         ]
-        modelo = ModeloML('model.pkl')
-        predict, error = modelo.predecir2(data)
-        prediction = float(predict[0])
+        modelo = ModeloML('modelANN.pkl', 'scalerANN.pkl')
+        predict, error = modelo.predecir_ann(data)
+        print(predict)
+        print(error)
+        prediction = predict
 
         # next_id = db.get_next_id()
 
@@ -91,9 +93,10 @@ class Prediction:
         parameters = {
             "email": user_email,
         }
-        db.execute_write(query, parameters)
-
-        return prediction
+        if prediction:
+            db.execute_write(query, parameters)
+            return prediction
+        return 'Error al realizar la prediccion'
         # return Prediction(next_id,
         #                   high_bp, high_chol, bmi, smoker, stroke,
         #                   heart_disease_or_attack, phys_activity, gen_hlth,

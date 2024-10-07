@@ -1,3 +1,5 @@
+import json
+
 from flask import Blueprint, request
 from flask_restful import Resource, Api
 from ..services.predition_service import process_data
@@ -5,19 +7,21 @@ from .schemas.prediction_schema import PredictionSchema
 from marshmallow import ValidationError
 from ..services.prediction import Prediction
 from flask_jwt_extended import (jwt_required, decode_token)
+from flask import jsonify
+
 data_blueprint = Blueprint('data', __name__)
 api = Api(data_blueprint)
+
 
 
 class DataModel(Resource):
     def post(self):
         data = request.json
         resultado, error = process_data(data)
-
         if error:
             return {'error': error}, 400
         else:
-            return {'resultado': resultado}, 200
+            return resultado, 200
 
 
 class RegisterPrediction(Resource):
