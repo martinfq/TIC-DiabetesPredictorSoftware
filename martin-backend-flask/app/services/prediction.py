@@ -112,7 +112,7 @@ class Prediction:
         """
         parameters = {"email": user_email}
         result, code = db.execute_read(query, parameters)
-
+        print(result)
         predictions = []
         for record in result:
             predictions.append(record['p'].get('Prediction'))

@@ -13,7 +13,6 @@ data_blueprint = Blueprint('data', __name__)
 api = Api(data_blueprint)
 
 
-
 class DataModel(Resource):
     def post(self):
         data = request.json
@@ -62,7 +61,8 @@ class RegisterPrediction(Resource):
 
 
 class GetPredictionByEmail(Resource):
-    def get(self, email):
+    def get(self):
+        email = request.args.get('email')
         prediction = Prediction.get_user_predictions(email)
         if prediction:
             return {"predictions": prediction}, 200
@@ -72,4 +72,4 @@ class GetPredictionByEmail(Resource):
 
 api.add_resource(DataModel, '/model')
 api.add_resource(RegisterPrediction, '/predict/register')
-api.add_resource(GetPredictionByEmail, '/predict/email/<email>')
+api.add_resource(GetPredictionByEmail, '/predict/')
