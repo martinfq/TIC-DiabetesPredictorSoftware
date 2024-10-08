@@ -2,7 +2,7 @@ from ..db.neo4j import db
 from .predition_service import process_data
 from .models import ModeloML
 from .user import User
-
+from datetime import datetime
 
 class Prediction:
 
@@ -49,8 +49,6 @@ class Prediction:
         print(error)
         prediction = predict
 
-        # next_id = db.get_next_id()
-
         db.execute_write(
             """
             CREATE (p:Prediction {
@@ -66,7 +64,7 @@ class Prediction:
                 MentHlth: $ment_hlth,
                 PhysHlth: $phys_hlth,
                 Age: $age,
-                Prediction: $prediction
+                Prediction: $prediction,
             })
             """,
             {
@@ -82,7 +80,7 @@ class Prediction:
                 "ment_hlth": ment_hlth,
                 "phys_hlth": phys_hlth,
                 "age": user_age,
-                "prediction": prediction
+                "prediction": prediction,
             }
         )
         query = """
@@ -106,9 +104,11 @@ class Prediction:
     @staticmethod
     def get_user_predictions(user_email):
         query = """
-        MATCH (u:User)-[:HAVE]->(p:Prediction)
+        MATCH (u:User)-[h:HAVE]->(p:Prediction)
         WHERE u.email = $email
         RETURN p
+        ORDER BY h.fecha DESC
+        LIMIT 1
         """
         parameters = {"email": user_email}
         result, code = db.execute_read(query, parameters)
@@ -118,3 +118,4 @@ class Prediction:
             predictions.append(record['p'].get('Prediction'))
 
         return predictions
+

@@ -1,3 +1,5 @@
+import json
+
 from ..db.neo4j import db
 from datetime import datetime
 
@@ -61,8 +63,12 @@ class User:
             )
             if result:
                 record = result[0]
-                return User(record["email"], record["name"], record["last_name"],
-                            record["password"], record["birthday"], record["age"], record["gender"])
+                del record['password']
+                record['birthday'] = str(record['birthday'])
+                json_data = json.dumps(record)
+                return json_data
+                # return User(record["email"], record["name"], record["last_name"],
+                #             record["password"], record["birthday"], record["age"], record["gender"])
             return None
         except Exception as e:
             print(f"Error al obtener el usuario: {e}")

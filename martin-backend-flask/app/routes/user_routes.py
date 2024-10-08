@@ -1,3 +1,5 @@
+import json
+
 from flask import Blueprint, request, jsonify
 from flask_restful import Resource, Api
 from marshmallow import ValidationError
@@ -48,10 +50,11 @@ class RegisterUser(Resource):
 
 
 class GetUserByEmail(Resource):
-    def get(self, email):
-        user = User.get_user_by_email(email)
-        if user:
-            return {"email": user.email, "edad": user.age}, 200
+    def get(self):
+        email = request.args.get('email')
+        user_info = User.get_user_by_email(email)
+        if user_info:
+            return json.loads(user_info), 200
         else:
             return {"message": "User not found or error occurred"}, 404
 
@@ -84,4 +87,4 @@ class UpdateUser(Resource):
 api.add_resource(Users, '/users')
 api.add_resource(UpdateUser, '/users/<string:username>')
 api.add_resource(RegisterUser, '/user/register')
-api.add_resource(GetUserByEmail, '/user/email/<email>')
+api.add_resource(GetUserByEmail, '/user/')
