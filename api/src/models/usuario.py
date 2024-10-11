@@ -3,10 +3,11 @@ from datetime import datetime
 
 
 class Usuario:    
-    def __init__(self, fechaNacimiento, genero, nombre, email, password):
+    def __init__(self, fechaNacimiento, genero, nombre, last_name, email, password):
         self.fechaNacimiento = fechaNacimiento
         self.genero = genero
         self.nombre = nombre
+        self.last_name = last_name
         self.email  = email
         self.password = password
     
@@ -23,7 +24,11 @@ class Usuario:
                 return False
 
             #Nombre
-            if not re.match("^[A-Za-z]+ [A-Za-z]+$", self.nombre):
+            if not re.match("^[A-Za-z]+$", self.nombre):
+                return False
+
+            #Last Name
+            if not re.match("^[A-Za-z]+$", self.last_name):
                 return False
 
             #Genero
@@ -32,14 +37,14 @@ class Usuario:
                 return False
 
             #Fecha
-            if not re.match("^\d{1,2}/\d{1,2}/\d{4}$", self.fechaNacimiento):
+            if not re.match("^\d{4}-\d{1,2}-\d{1,2}$", self.fechaNacimiento):
                 return False
 
             try:
-                datetime.strptime(self.fechaNacimiento, '%d/%m/%Y')
+                datetime.strptime(self.fechaNacimiento, '%Y-%m-%d')
             except ValueError:
                 return False
-                
+
             self.password = hashlib.sha256(self.password.encode()).hexdigest()
         except Exception as e:
             return False   

@@ -3,11 +3,11 @@ from database.redis_connection import redis_connection
 import hashlib, uuid, jwt
 from services.prediction_service import predecir_diabetes, cargar_modelo, obtener_predicciones_por_usuario
 from models.caracteristicas_prediccion import CaracteristicasPrediccion
-from services.user_service import usuario_existe
+from services.user_service import UserService
 
 
 app = Blueprint('predictions_blueprint', __name__)
-
+user_service = UserService()
 
 @app.route('/crear', methods=['POST'])
 def crear_prediccion():
@@ -36,7 +36,7 @@ def crear_prediccion():
         email = jwt.decode(token_session.split(" ")[1], "passPrueba", algorithms=['HS256']).get("email")
 
         #VALIDACION DE LA EXISTENCIA DEL USUARIO
-        if not usuario_existe(email):
+        if not user_service.usuario_existe(email):
             return jsonify({'ERROR': 'USUARIO INEXISTENTE'}), 400
 
         #VALIDACION DEL DOMINIO DE LOS CAMPOS
@@ -54,7 +54,7 @@ def crear_prediccion():
 
         prediccion_id = str(uuid.uuid4())       
         connection = redis_connection()
-        connection.hset(f"prediccion:{prediccion_id}", mapping=prediccion) #CREACION DE PREDICCIONES
+        connection.hmset(f"prediccion:{prediccion_id}", prediccion) #CREACION DE PREDICCIONES
         connection.sadd("PREDICCIONES", prediccion_id) #Modificar por sets inversos
         connection.connection_pool.disconnect()
         
@@ -76,7 +76,7 @@ def obtener_predicciones():
         email = jwt.decode(token_session.split(" ")[1], "passPrueba", algorithms=['HS256']).get("email")
         
         #VALIDAR QUE EL USUARIO EXISTA EN LOS REGISTROS
-        if not usuario_existe(email):
+        if not user_service.usuario_existe(email):
             return jsonify({'ERROR': 'USUARIO INEXISTENTE'}), 400
 
         predicciones = obtener_predicciones_por_usuario(email)
