@@ -2,6 +2,7 @@ import pickle
 import os
 import numpy as np
 from app import mongo
+from datetime import datetime, timezone
 from pymongo.errors import PyMongoError
 from app.models.prediction_model import Prediccion
 
@@ -70,6 +71,7 @@ def predict_diabetes(modelo, scaler, data):
 # Funcion que almacena la prediccion en la DB
 def save_prediction(data):
     try:
+        current_time = datetime.now(timezone.utc)
         prediction_data = {
             'user_email': data.user_email, 
             'HighBP': data.HighBP, 
@@ -83,7 +85,8 @@ def save_prediction(data):
             'MentHlth': data.MentHlth, 
             'PhysHlth': data.PhysHlth,
             'Age': data.Age,
-            'rPrediccion': data.rPrediccion
+            'rPrediccion': data.rPrediccion,
+            'timestamp': current_time
         }
         prediction_created = mongo.db.prediction.insert_one(prediction_data)
         return prediction_created

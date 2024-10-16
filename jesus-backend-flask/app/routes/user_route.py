@@ -1,5 +1,5 @@
 import jwt
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, abort
 from app.models.user_model import User
 from app.schema.user_schema import validate_user, validate_login
 from app.services.user_services import save_user
@@ -61,6 +61,30 @@ def get_user(email):
         return jsonify(user), 200
     else:
         return jsonify({"message": "User not found"}), 404
+    
+#============================ USUARIO: GET BY EMAIL ============================#
+@user_bp.route('/user/', methods=['GET'])
+def get_user_email():
+    try:
+         # leo el token
+        access_token = request.headers.get('Authorization')
+        # validacion del token 
+        if not access_token:
+            abort(401, description='Token faltante')
+        # Info del usuario
+        user_email = jwt.decode(access_token.split(" ")[1], "passPrueba", algorithms=['HS256'])['email']
+
+        user = User.find_by_email(user_email)
+        if user:
+            return jsonify(user), 200
+        else:
+            return jsonify({"message": "User not found"}), 404
+    except jwt.ExpiredSignatureError:
+        abort(401, description='Token expirado')
+    except jwt.InvalidTokenError:
+        abort(401, description='Token inválido')
+    except Exception as e:
+        abort(500, description=f'error {str(e)}')
     
 #============================ USUARIO: DELETE ============================#
 @user_bp.route('/user/delete_user/<user_email>', methods=['DELETE'])
