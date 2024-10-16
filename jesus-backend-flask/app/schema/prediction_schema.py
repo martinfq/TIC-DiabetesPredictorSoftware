@@ -1,5 +1,5 @@
 def validate_prediction_input(data):
-    required_fields = ['BP', 'Chol', 'BMI', 'Smoker', 'Stroke', 'HDA', 'PA', 'GH', 'MH', 'PH']
+    required_fields = ['HighBP', 'HighChol', 'BMI', 'Smoker', 'Stroke', 'HeartDiseaseorAttack', 'PhysActivity', 'GenHlth', 'MentHlth', 'PhysHlth']
     errors = []
 
     # Verifica que los campos no esten vacios
@@ -9,34 +9,34 @@ def validate_prediction_input(data):
 
     # Verifica el contenido de cada campo
 
-    if 'BP' in data and (not isinstance(data['BP'], int) or (data['BP']!=0 and data['BP']!=1)):
-        errors.append('El BP debe ser un número.')
+    if 'HighBP' in data and (not isinstance(data['HighBP'], int) or (data['HighBP']!=0 and data['HighBP']!=1)):
+        errors.append('El BP debe ser un número entre 0 y 1.')
 
-    if 'Chol' in data and (not isinstance(data['Chol'], int) or (data['Chol']!=0 and data['Chol']!=1)):
-        errors.append('El Chol debe ser un número.')
+    if 'HighChol' in data and (not isinstance(data['HighChol'], int) or (data['HighChol']!=0 and data['HighChol']!=1)):
+        errors.append('El Chol debe ser un número entre 0 y 1.')
     
     if 'BMI' in data and (not isinstance(data['BMI'], int) or data['BMI']<10):
-        errors.append('El BMI debe ser un número.')
+        errors.append('El BMI debe ser un número mayor a 10.')
     
     if 'Smoker' in data and (not isinstance(data['Smoker'], int) or (data['Smoker']!=0 and data['Smoker']!=1)):
-        errors.append('El Smoker debe ser un número.')
+        errors.append('El Smoker debe ser un número entre 0 y 1.')
 
     if 'Stroke' in data and (not isinstance(data['Stroke'], int) or (data['Stroke']!=0 and data['Stroke']!=1)):
-        errors.append('El Stroke debe ser un número.')
+        errors.append('El Stroke debe ser un número entre 0 y 1.')
 
-    if 'HDA' in data and (not isinstance(data['HDA'], int) or (data['HDA']!=0 and data['HDA']!=1)):
-        errors.append('El HDA debe ser un número.')
+    if 'HeartDiseaseorAttack' in data and (not isinstance(data['HeartDiseaseorAttack'], int) or (data['HeartDiseaseorAttack']!=0 and data['HeartDiseaseorAttack']!=1)):
+        errors.append('El HeartDiseaseorAttack debe ser un número entre 0 y 1.')
 
-    if 'PA' in data and (not isinstance(data['PA'], int) or (data['PA']!=0 and data['PA']!=1)):
-        errors.append('El PA debe ser un número.')
+    if 'PhysActivity' in data and (not isinstance(data['PhysActivity'], int) or (data['PhysActivity']!=0 and data['PhysActivity']!=1)):
+        errors.append('El PhysActivity debe ser un número entre 0 y 1.')
 
-    if 'GH' in data and (not isinstance(data['GH'], int) or (data['GH']<0 and data['GH']>30)):
-        errors.append('El GH debe ser un número.')
+    if 'GenHlth' in data and (not isinstance(data['GenHlth'], int) or (data['GenHlth']<0 and data['GenHlth']>5)):
+        errors.append('El GenHlth debe ser un número entre 1 y 5.')
 
-    if 'MH' in data and (not isinstance(data['MH'], int) or (data['MH']<0 and data['MH']>30)):
-        errors.append('El MH debe ser un número.')
+    if 'MentHlth' in data and (not isinstance(data['MentHlth'], int) or (data['MentHlth']<0 and data['MentHlth']>30)):
+        errors.append('El MentHlth debe ser un número entre 0 y 30.')
 
-    if 'PH' in data and (not isinstance(data['PH'], int) or (data['PH']<0 and data['PH']>30)):
-        errors.append('El PH debe ser un número.')
+    if 'PhysHlth' in data and (not isinstance(data['PhysHlth'], int) or (data['PhysHlth']<0 and data['PhysHlth']>30)):
+        errors.append('El PhysHlth debe ser un número entre 0 y 1.')
 
     return errors if errors else None

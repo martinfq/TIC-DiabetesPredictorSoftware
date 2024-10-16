@@ -1,36 +1,87 @@
 import pickle
 import os
+import numpy as np
 from app import mongo
 from pymongo.errors import PyMongoError
+from app.models.prediction_model import Prediccion
 
+# Funcion encargada de cargar el Modelo Predictivo y el Scaler
 def load_model():
     try:
-        model_path = os.path.join(os.path.dirname(__file__), 'model.pkl')
+        model_path = os.path.join(os.path.dirname(__file__), 'modelANN.pkl')
+        model_scaler_path = os.path.join(os.path.dirname(__file__), 'scalerANN.pkl')
         with open(model_path, 'rb') as file:
             model = pickle.load(file)
-        return model
+        with open(model_scaler_path, 'rb') as file:
+            scaler = pickle.load(file)
+        return model, scaler
     except Exception as e:
         print(f"Error al cargar el modelo: {e}")
         return None
+    
+# Funcion que define el objeto Prediccion
+def create_prediction_object(data, user_email, edadUser):
+    return Prediccion(
+        user_email=user_email,
+        HighBP=data["HighBP"],
+        HighChol=data["HighChol"],
+        BMI=data["BMI"],
+        Smoker=data["Smoker"],
+        Stroke=data["Stroke"],
+        HeartDiseaseorAttack=data["HeartDiseaseorAttack"],
+        PhysActivity=data["PhysActivity"],
+        GenHlth=data["GenHlth"],
+        MentHlth=data["MentHlth"],
+        PhysHlth=data["PhysHlth"],
+        Age=edadUser,
+    )
 
-def predict_diabetes(modelo, data):
-    features = [data.BP, data.Chol, data.BMI, data.Smoker, data.Stroke, data.HDA, data.PA, data.GH, data.MH, data.PH, data.Age]
-    data.rPrediccion = modelo.predict([features])[0]
+# Funcion que llama al modelo y a la funcion que ejecuta la prediccion
+def make_prediction (data_prediction):
+    features = [
+        float(data_prediction.HighBP), 
+        float(data_prediction.HighChol), 
+        float(data_prediction.BMI), 
+        float(data_prediction.Smoker), 
+        float(data_prediction.Stroke), 
+        float(data_prediction.HeartDiseaseorAttack), 
+        float(data_prediction.PhysActivity), 
+        float(data_prediction.GenHlth), 
+        float(data_prediction.MentHlth), 
+        float(data_prediction.PhysHlth), 
+        data_prediction.Age
+    ]
 
-def save_predicition(data):
+    model_loaded = load_model()
+    model, scaler = model_loaded
+    return predict_diabetes(model, scaler, features)
+
+# Funcion que ejecuta la prediccion
+def predict_diabetes(modelo, scaler, data):
+    try:
+        np_features = np.array(data)
+        features_scaler = scaler.transform(np_features.reshape(1,-1))
+        result_predict = modelo.predict(features_scaler)[0][1]
+        return round(float(result_predict),4)
+    except Exception as e:
+        print(f"Error al crear la prediccion: {e}")
+        return None
+
+# Funcion que almacena la prediccion en la DB
+def save_prediction(data):
     try:
         prediction_data = {
-            'correo': data.correo, 
-            'BP': data.BP, 
-            'Chol': data.Chol, 
+            'user_email': data.user_email, 
+            'HighBP': data.HighBP, 
+            'HighChol': data.HighChol, 
             'BMI': data.BMI,
             'Smoker': data.Smoker, 
             'Stroke': data.Stroke, 
-            'HDA': data.HDA, 
-            'PA': data.PA, 
-            'GH': data.GH, 
-            'MH': data.MH, 
-            'PH': data.PH,
+            'HeartDiseaseorAttack': data.HeartDiseaseorAttack, 
+            'PhysActivity': data.PhysActivity, 
+            'GenHlth': data.GenHlth, 
+            'MentHlth': data.MentHlth, 
+            'PhysHlth': data.PhysHlth,
             'Age': data.Age,
             'rPrediccion': data.rPrediccion
         }

@@ -1,0 +1,89 @@
+import jwt
+from flask import Blueprint, jsonify, request, abort
+from app.models.prediction_model import Prediccion
+from app.schema.prediction_schema import validate_prediction_input
+from app.models.user_model import User
+from app.services.prediction_services import save_prediction, create_prediction_object, make_prediction
+
+
+prediction_bp = Blueprint('prediction', __name__)
+
+#============================ PREDICCION: POST ============================# /predict/create
+@prediction_bp.route("/predict/register", methods=["POST"])
+def add_prediction():
+    try:
+        # leo el token
+        access_token = request.headers.get('Authorization')
+        # validacion del token 
+        if not access_token:
+            abort(401, description='Token faltante')
+        # Info del usuario
+        user_email = jwt.decode(access_token.split(" ")[1], "passPrueba", algorithms=['HS256'])['email']
+        # Extraigo la edad del usuario
+        edadUser = User.find_by_email(user_email)['age']
+        data = request.get_json()
+        print(data)
+        # Validar datos de entrada
+        error = validate_prediction_input(data)
+        if error:
+            abort(400, description=error)
+
+        # Creo el objeto para la prediccion
+        data_prediction = create_prediction_object(data, user_email, edadUser)
+        # Realizo la prediccion y obtengo su valor
+        data_prediction.rPrediccion = make_prediction(data_prediction)
+        # Guardo la prediccion en la base de datos
+        save_prediction(data_prediction)
+
+        return jsonify({
+            'message': "Prediction added successfully",
+            'usuario': user_email,
+            'edad': edadUser,
+            'prediccion': data_prediction.rPrediccion
+        }), 201
+    except jwt.ExpiredSignatureError:
+        abort(401, description='Token expirado')
+    except jwt.InvalidTokenError:
+        abort(401, description='Token inválido')
+    except Exception as e:
+        abort(500, description=f'error {str(e)}')
+
+#============================ PREDICCION: GET ALL ============================#
+@prediction_bp.route("/predicts/", methods=["GET"])
+def get_all_predictions():
+    predictions = Prediccion.find_all()
+    return jsonify(predictions), 200
+
+#============================ PREDICCION: GET BY EMAIL ============================#
+@prediction_bp.route('/predict/', methods=['GET'])
+def get_prediction():
+    
+    # leo el token
+    access_token = request.headers.get('Authorization')
+    # validacion del token 
+    if not access_token:
+        return jsonify({'error': 'Token faltante'}), 401
+    # info del usuario
+    user_email = jwt.decode(access_token.split(" ")[1], "passPrueba", algorithms=['HS256'])['email']
+
+    prediction = Prediccion.find_by_email(user_email)
+    return jsonify(prediction), 200
+    
+
+#============================ PREDICCION: DELETE ============================#
+@prediction_bp.route('/delete_predict/', methods=['DELETE'])
+def delete_user():
+    # leo el token
+    access_token = request.headers.get('Authorization')
+    # validacion del token 
+    if not access_token:
+        return jsonify({'error': 'Token faltante'}), 401
+    # info del usuario
+    user_email = jwt.decode(access_token.split(" ")[1], "passPrueba", algorithms=['HS256'])['email']
+    # busco la prediccion
+    prediction = Prediccion.find_by_email(user_email)
+    if prediction:
+        Prediccion.delete(user_email)
+        return jsonify({'message': 'Prediction deleted successfully'}), 200
+    else:
+        return jsonify({'error': 'Prediction not found'}), 404

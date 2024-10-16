@@ -1,20 +1,19 @@
 from app import mongo
 from pymongo.errors import PyMongoError
 
-class Modelo:
-
-    def __init__(self, correo, BP, Chol, BMI, Smoker, Stroke, HDA, PA, GH, MH, PH, Age):
-        self.correo = correo
-        self.BP = BP
-        self.Chol = Chol
+class Prediccion:
+    def __init__(self, user_email, HighBP, HighChol, BMI, Smoker, Stroke, HeartDiseaseorAttack, PhysActivity, GenHlth, MentHlth, PhysHlth, Age):
+        self.user_email = user_email
+        self.HighBP = HighBP
+        self.HighChol = HighChol
         self.BMI = BMI
         self.Smoker = Smoker
         self.Stroke = Stroke
-        self.HDA = HDA
-        self.PA = PA
-        self.GH = GH
-        self.MH = MH
-        self.PH = PH
+        self.HeartDiseaseorAttack = HeartDiseaseorAttack
+        self.PhysActivity = PhysActivity
+        self.GenHlth = GenHlth
+        self.MentHlth = MentHlth
+        self.PhysHlth = PhysHlth
         self.Age = Age
         self.rPrediccion = None
         
@@ -31,10 +30,10 @@ class Modelo:
             return None
 
     @staticmethod
-    def find_by_email(correo):
+    def find_by_email(user_email):
         try:
             predictionRecords = []
-            for prediction in mongo.db.prediction.find({"correo": correo}):
+            for prediction in mongo.db.prediction.find({"user_email": user_email}):
                 prediction["_id"] = str(prediction["_id"])
                 predictionRecords.append(prediction)
             return predictionRecords
@@ -43,9 +42,9 @@ class Modelo:
             return None
         
     @staticmethod
-    def delete(correo):
+    def delete(user_email):
         try:
-            return mongo.db.prediction.delete_many({"correo": correo})
+            return mongo.db.prediction.delete_many({"user_email": user_email})
         except PyMongoError as e:
             print(f"Error al eliminar la prediccion: {e}")
             return False

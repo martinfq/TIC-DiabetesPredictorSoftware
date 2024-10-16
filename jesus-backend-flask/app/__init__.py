@@ -13,8 +13,8 @@ def create_app():
     mongo.init_app(app)
     CORS(app)
     # Blueprints
-    from app.routes.user import user_bp
-    from app.routes.prediction import prediction_bp
+    from app.routes.user_route import user_bp
+    from app.routes.prediction_route import prediction_bp
 
     app.register_blueprint(user_bp)
     app.register_blueprint(prediction_bp)
