@@ -7,6 +7,6 @@ app = Flask(__name__)
 def init_app():
     CORS(app) 
     app.register_blueprint(users_routes.app, url_prefix='/')
-    app.register_blueprint(predictions_routes.app, url_prefix='/predicciones')
+    app.register_blueprint(predictions_routes.app, url_prefix='/')
     
     return app

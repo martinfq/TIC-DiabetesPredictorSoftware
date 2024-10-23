@@ -12,48 +12,42 @@ class CaracteristicasPrediccion:
         self.physHlth = physHlth
         self.age = age
 
-    #AGREGAR METODO DE CLASE PARA VALIDAR LOS CAMPOS Y SU DOMINIO
     def is_valid(self):
         #HighBP
-        if not isinstance(self.highBP, int) or (self.highBP != 0 and self.highBP != 1):
+        if not isinstance(self.highBP, (int, float)) or self.highBP not in (0, 1):
             return False
 
         #HighChol
-        if not isinstance(self.highChol, int) or (self.highChol != 0 and self.highChol != 1):
+        if not isinstance(self.highChol, (int, float)) or self.highChol not in (0, 1):
             return False
 
         #BMI
-        if not isinstance(self.bmi, int) or self.bmi < 1:
+        if not isinstance(self.bmi, (int, float)) or self.bmi < 1:
             return False
 
         #Smoker
-        if not isinstance(self.smoker, int) or (self.smoker != 0 and self.smoker != 1):
+        if not isinstance(self.smoker, (int, float)) or self.smoker not in (0, 1):
             return False
 
         #Stroke
-        if not isinstance(self.stroke, int) or (self.stroke != 0 and self.stroke != 1):
+        if not isinstance(self.stroke, (int, float)) or self.stroke not in (0, 1):
             return False
 
         #HeartDiseaseOrAttack
-        if not isinstance(self.heartDiseaseOrAttack, int) or (self.heartDiseaseOrAttack != 0 and self.heartDiseaseOrAttack != 1):
-            return False
-
-        #PhysActivity
-        if not isinstance(self.physActivity, int) or (self.physActivity != 0 and self.physActivity != 1):
+        if not isinstance(self.heartDiseaseOrAttack, (int, float)) or self.heartDiseaseOrAttack not in (0, 1):
             return False
 
         #GenHlth
-        if not isinstance(self.genHlth, int) or (self.genHlth < 0 or self.genHlth > 30):
+        if not isinstance(self.genHlth, (int, float)) or not (1 <= self.genHlth <= 5):
             return False
 
-        #MentHlth
-        if not isinstance(self.mentHlth, int) or (self.mentHlth < 0 or self.mentHlth > 30):
-            return False
-
-        #PhysHlth
-        if not isinstance(self.physHlth, int) or (self.physHlth < 0 or self.physHlth > 30):
-            return False
+        #PhysActivity, MentHlth y PhysHlth
+        for attr in [self.physActivity, self.genHlth, self.mentHlth, self.physHlth]:
+            if not isinstance(attr, (int, float)) or not (0 <= attr <= 30):
+                return False
 
         #Age
+        if not isinstance(self.age, (int, float)) or self.age < 0:
+            return False
 
         return True

@@ -38,5 +38,5 @@ def login():
     if resultado[1] != 200:
         return jsonify({'error': resultado[0]}), resultado[1]
 
-    return jsonify({'token_session': resultado[0]}), 200
+    return jsonify({'access_token': resultado[0]}), 200
 

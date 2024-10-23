@@ -22,11 +22,12 @@ class UserService:
         if email is None or password is None:
             return 'CREDENCIALES INCORRECTAS.', 400
 
-        if not self.usuario_existe(email) or not validar_credenciales(email, password):
+        credenciales = validar_credenciales(email, password)
+        if not self.usuario_existe(email) or not credenciales:
             return 'CREDENCIALES INCORRECTAS.', 400
 
         #CREACION DEL TOKEN DE USUARIO
-        token_session = jwt.encode({'email': email}, "passPrueba", algorithm='HS256')
+        token_session = jwt.encode({'email': email, 'id' : credenciales[1]}, "passPrueba", algorithm='HS256')
         return token_session, 200
 
 

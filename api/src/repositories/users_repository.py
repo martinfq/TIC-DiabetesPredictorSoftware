@@ -23,16 +23,18 @@ def validar_credenciales(email, password):
 
         if email_user == email and password_user == password:
             connection.connection_pool.disconnect()
-            return True
+            return True, clave
 
     connection.connection_pool.disconnect()
-    return False
+    return None
 
 
 def crear_usuario(nuevo_usuario):
     connection = redis_connection()
-    connection.hmset(f"usuario:{str(uuid.uuid4())}", nuevo_usuario.data())
+    usuario_id = str(uuid.uuid4())
+    connection.hmset(f"usuario:{usuario_id}", nuevo_usuario.data())
     connection.sadd("USUARIOS", nuevo_usuario.email)
+    connection.sadd("LAST_PREDICTION", f"{usuario_id}:NONE")
     connection.connection_pool.disconnect()
 
     return 200
