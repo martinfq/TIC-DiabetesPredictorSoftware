@@ -65,6 +65,14 @@ class Protected(Resource):
         return jsonify(logged_in_as=identity), 200
 
 
+class VerifyToken(Resource):
+    @jwt_required()
+    def get(self):
+        current_user = get_jwt_identity()
+        return jsonify(valid=True, user_id=current_user), 200
+
+
 auth_bp.add_url_rule('/login', view_func=AuthLogin.as_view('login'))
 auth_bp.add_url_rule('/logout', view_func=AuthLogout.as_view('logout'))
 auth_bp.add_url_rule('/protected', view_func=Protected.as_view('protected'))
+auth_bp.add_url_rule('/verify-token', view_func=Protected.as_view('verify-token'))

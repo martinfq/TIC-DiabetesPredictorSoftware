@@ -18,8 +18,9 @@ class Auth:
             raise ValueError("Incorrect password")
 
         login_user(user)
-        access_token = create_access_token(identity={'email': user.email})
+        access_token = create_access_token(identity=user.email)
         return access_token
+
 
 class UserNotFoundError(Exception):
     """Excepción lanzada cuando no se encuentra el usuario"""

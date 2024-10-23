@@ -52,7 +52,7 @@ class RegisterUser(Resource):
 class GetUserByEmail(Resource):
     def get(self):
         email = request.args.get('email')
-        user_info = User.get_user_by_email(email)
+        user_info = User.get_user_by_email(email).to_json()
         if user_info:
             return json.loads(user_info), 200
         else:

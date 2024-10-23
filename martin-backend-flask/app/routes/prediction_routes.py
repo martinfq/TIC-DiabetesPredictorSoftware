@@ -30,7 +30,7 @@ class RegisterPrediction(Resource):
         token = request.headers.get('Authorization').split()[1]
         decoded_token = decode_token(token)
         user_email_from_token = decoded_token.get(
-            'sub').get('email')
+            'sub')
 
         # Obtener los datos del cuerpo de la solicitud
         json_data = request.get_json()

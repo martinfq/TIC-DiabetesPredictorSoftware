@@ -64,7 +64,7 @@ class Prediction:
                 MentHlth: $ment_hlth,
                 PhysHlth: $phys_hlth,
                 Age: $age,
-                Prediction: $prediction,
+                Prediction: $prediction
             })
             """,
             {

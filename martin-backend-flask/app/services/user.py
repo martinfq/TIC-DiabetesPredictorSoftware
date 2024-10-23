@@ -18,6 +18,10 @@ class User:
         self.is_active = is_active
         self.is_anonymous = is_anonymous
 
+    def to_json(self):
+        # Usamos __dict__ para convertir el objeto en un diccionario y luego lo serializamos con json.dumps
+        return json.dumps(self.__dict__)
+
     @staticmethod
     def create_user(email, name, last_name, password, birthday, gender=None):
         db.execute_write(
@@ -50,7 +54,7 @@ class User:
         )
         return User(email, name, last_name, password, birthday, gender)
 
-    def get_user(query:str, value):
+    def get_user(query: str, value):
         try:
             result, error = db.execute_read(
                 f"""
@@ -63,12 +67,12 @@ class User:
             )
             if result:
                 record = result[0]
-                del record['password']
-                record['birthday'] = str(record['birthday'])
-                json_data = json.dumps(record)
-                return json_data
-                # return User(record["email"], record["name"], record["last_name"],
-                #             record["password"], record["birthday"], record["age"], record["gender"])
+                # del record['password']
+                # record['birthday'] = str(record['birthday'])
+                # json_data = json.dumps(record)
+                # return json_data
+                return User(record["email"], record["name"], record["last_name"],
+                            record["password"], str(record['birthday']), record["age"], record["gender"])
             return None
         except Exception as e:
             print(f"Error al obtener el usuario: {e}")
@@ -81,12 +85,21 @@ class User:
             return None
         return user
 
+    # @staticmethod
+    # def get_user_password(email):
+    #     user_info = User.get_user("email", email)
+    #     data = json.loads(user_info)
+    #     if not user_info:
+    #         return None
+    #     return data['password']
+
     @staticmethod
     def get_user_age(email):
         user = User.get_user("email", email)
         if not user:
             return None
         return user.age
+
     @staticmethod
     def get_all_users():
         try:
