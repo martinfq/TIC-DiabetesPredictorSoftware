@@ -6,7 +6,7 @@ from marshmallow import ValidationError
 from ..services.user import User
 from .schemas.user_schema import UserSchema
 
-from flask_jwt_extended import (jwt_required)
+from flask_jwt_extended import (jwt_required, decode_token)
 
 user_blueprint = Blueprint('user', __name__)
 api = Api(user_blueprint)
@@ -49,10 +49,14 @@ class RegisterUser(Resource):
         return {"email": user.email, "message": "User created successfully"}, 201
 
 
-class GetUserByEmail(Resource):
+class GetUserInfo(Resource):
+    @jwt_required()
     def get(self):
-        email = request.args.get('email')
-        user_info = User.get_user_by_email(email).to_json()
+        token = request.headers.get('Authorization').split()[1]
+        decoded_token = decode_token(token)
+        email_from_token = decoded_token.get(
+            'sub')
+        user_info = User.get_user_by_email(email_from_token).to_json()
         if user_info:
             return json.loads(user_info), 200
         else:
@@ -87,4 +91,4 @@ class UpdateUser(Resource):
 api.add_resource(Users, '/users')
 api.add_resource(UpdateUser, '/users/<string:username>')
 api.add_resource(RegisterUser, '/user/register')
-api.add_resource(GetUserByEmail, '/user/')
+api.add_resource(GetUserInfo, '/user/')

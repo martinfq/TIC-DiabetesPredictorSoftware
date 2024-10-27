@@ -61,11 +61,29 @@ class RegisterPrediction(Resource):
 
 
 class GetPredictionByEmail(Resource):
+    @jwt_required()
     def get(self):
-        email = request.args.get('email')
-        prediction = Prediction.get_user_predictions(email)
+        token = request.headers.get('Authorization').split()[1]
+        decoded_token = decode_token(token)
+        email_from_token = decoded_token.get(
+            'sub')
+        prediction = Prediction.get_user_predictions(email_from_token)
         if prediction:
-            return {"predictions": prediction}, 200
+            return prediction, 200
+        else:
+            return {"message": "User not found or error occurred"}, 404
+
+
+class GetLastPrediction(Resource):
+    @jwt_required()
+    def get(self):
+        token = request.headers.get('Authorization').split()[1]
+        decoded_token = decode_token(token)
+        email_from_token = decoded_token.get(
+            'sub')
+        prediction = Prediction.get_last_prediction(email_from_token)
+        if prediction:
+            return prediction, 200
         else:
             return {"message": "User not found or error occurred"}, 404
 
@@ -73,3 +91,4 @@ class GetPredictionByEmail(Resource):
 api.add_resource(DataModel, '/model')
 api.add_resource(RegisterPrediction, '/predict/register')
 api.add_resource(GetPredictionByEmail, '/predict/')
+api.add_resource(GetLastPrediction, '/last-predict/')

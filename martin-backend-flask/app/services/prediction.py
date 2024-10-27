@@ -2,7 +2,8 @@ from ..db.neo4j import db
 from .predition_service import process_data
 from .models import ModeloML
 from .user import User
-from datetime import datetime
+import datetime
+
 
 class Prediction:
 
@@ -106,16 +107,36 @@ class Prediction:
         query = """
         MATCH (u:User)-[h:HAVE]->(p:Prediction)
         WHERE u.email = $email
-        RETURN p
+        RETURN p,h.fecha
         ORDER BY h.fecha DESC
-        LIMIT 1
         """
         parameters = {"email": user_email}
         result, code = db.execute_read(query, parameters)
-        print(result)
         predictions = []
         for record in result:
-            predictions.append(record['p'].get('Prediction'))
+            dt = datetime.datetime.fromtimestamp(record["h.fecha"] / 1000)
+            fecha = dt.date()
+            predictions.append({
+                "prediction": record["p"]["Prediction"],
+                "date":fecha.isoformat()
+            })
 
         return predictions
 
+    @staticmethod
+    def get_last_prediction(user_email):
+        query = """
+                MATCH (u:User)-[h:HAVE]->(p:Prediction)
+                WHERE u.email = $email
+                RETURN p,h.fecha
+                ORDER BY h.fecha DESC
+                LIMIT 1
+                """
+        parameters = {"email": user_email}
+        result, code = db.execute_read(query, parameters)
+
+        data = {
+            "prediction": result[0]["p"]["Prediction"],
+            "date": result[0]["h.fecha"]
+        }
+        return data

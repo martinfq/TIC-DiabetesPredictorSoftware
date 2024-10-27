@@ -1,7 +1,7 @@
 from .user import User
 from flask_login import login_user, logout_user, LoginManager
-from flask_jwt_extended import (create_access_token, jwt_required, get_jwt_identity,
-                                JWTManager, verify_jwt_in_request, get_jwt)
+from flask_jwt_extended import (create_access_token)
+from datetime import timedelta
 
 
 class Auth:
@@ -18,7 +18,7 @@ class Auth:
             raise ValueError("Incorrect password")
 
         login_user(user)
-        access_token = create_access_token(identity=user.email)
+        access_token = create_access_token(identity=user.email, expires_delta=timedelta(minutes=2))
         return access_token
 
 
