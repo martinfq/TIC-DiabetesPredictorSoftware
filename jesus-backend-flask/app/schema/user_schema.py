@@ -48,7 +48,7 @@ def validate_user(data):
         errors.append('La contrasena no cumple con los requisitos de seguridad.')
     
     if 'gender' in data and not validate_genero(data['gender']):
-        errors.append('El genero debe ser una M o F.')
+        errors.append('El genero debe ser Masculino o Femenino.')
 
     if 'birthday' in data and not validate_fecha(data['birthday']):
         errors.append('La fecha es incorrecta.')
@@ -77,12 +77,12 @@ def validate_nombreApellido(nombreApellido):
 
 
 def validate_genero(gender):
-    password_regex = r'^[MF]$'
+    password_regex = r'^(Masculino|Femenino)$'
+
     return re.match(password_regex, gender) is not None
 
 
 def validate_fecha(fecha):
-    # r'^(\d{4}\/(0[1-9]|[12][0-9]|3[01])\/0[1-9]|1[0-2])$'
     password_regex = r'^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})$'
     return re.match(password_regex, fecha) is not None
     

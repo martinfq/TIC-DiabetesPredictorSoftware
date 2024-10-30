@@ -22,7 +22,6 @@ def add_prediction():
         # Extraigo la edad del usuario
         edadUser = User.find_by_email(user_email)['age']
         data = request.get_json()
-        print(data)
         # Validar datos de entrada
         error = validate_prediction_input(data)
         if error:
@@ -31,7 +30,7 @@ def add_prediction():
         # Creo el objeto para la prediccion
         data_prediction = create_prediction_object(data, user_email, edadUser)
         # Realizo la prediccion y obtengo su valor
-        data_prediction.rPrediccion = make_prediction(data_prediction)
+        data_prediction.prediction = make_prediction(data_prediction)
         # Guardo la prediccion en la base de datos
         save_prediction(data_prediction)
 
@@ -39,7 +38,7 @@ def add_prediction():
             'message': "Prediction added successfully",
             'usuario': user_email,
             'edad': edadUser,
-            'prediccion': data_prediction.rPrediccion
+            'prediccion': data_prediction.prediction
         }), 201
     except jwt.ExpiredSignatureError:
         abort(401, description='Token expirado')
@@ -67,6 +66,22 @@ def get_prediction():
     user_email = jwt.decode(access_token.split(" ")[1], "passPrueba", algorithms=['HS256'])['email']
 
     prediction = Prediccion.find_by_email(user_email)
+    return jsonify(prediction), 200
+    
+#============================ PREDICCION: GET LAST BY EMAIL ============================#
+@prediction_bp.route('/last-predict/', methods=['GET'])
+def get_last_prediction():
+    
+    # leo el token
+    access_token = request.headers.get('Authorization')
+    # validacion del token 
+    if not access_token:
+        return jsonify({'error': 'Token faltante'}), 401
+    # info del usuario
+    user_email = jwt.decode(access_token.split(" ")[1], "passPrueba", algorithms=['HS256'])['email']
+
+    # ultima prediccion
+    prediction = Prediccion.find_last_by_email(user_email)
     return jsonify(prediction), 200
     
 

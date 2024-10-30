@@ -1,5 +1,5 @@
 def validate_prediction_input(data):
-    required_fields = ['HighBP', 'HighChol', 'BMI', 'Smoker', 'Stroke', 'HeartDiseaseorAttack', 'PhysActivity', 'GenHlth', 'MentHlth', 'PhysHlth']
+    required_fields = ['HighBp', 'HighChol', 'BMI', 'Smoker', 'Stroke', 'HeartDiseaseorAttack', 'PhysActivity', 'GenHlth', 'MentHlth', 'PhysHlth']
     errors = []
 
     # Verifica que los campos no esten vacios
@@ -9,7 +9,7 @@ def validate_prediction_input(data):
 
     # Verifica el contenido de cada campo
 
-    if 'HighBP' in data and (not isinstance(data['HighBP'], int) or (data['HighBP']!=0 and data['HighBP']!=1)):
+    if 'HighBp' in data and (not isinstance(data['HighBp'], int) or (data['HighBp']!=0 and data['HighBp']!=1)):
         errors.append('El BP debe ser un número entre 0 y 1.')
 
     if 'HighChol' in data and (not isinstance(data['HighChol'], int) or (data['HighChol']!=0 and data['HighChol']!=1)):

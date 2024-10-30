@@ -2,12 +2,8 @@
 
 ## ENTORNO VIRTUAL
 
+cd jesus-backend-flask
 .\venv\Scripts\activate
-
-## EJECUTAR
-
-### VENV
-
 python run.py
 
 ### MONGO DB

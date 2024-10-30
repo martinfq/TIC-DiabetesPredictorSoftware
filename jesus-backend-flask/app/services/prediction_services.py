@@ -24,7 +24,7 @@ def load_model():
 def create_prediction_object(data, user_email, edadUser):
     return Prediccion(
         user_email=user_email,
-        HighBP=data["HighBP"],
+        HighBp=data["HighBp"],
         HighChol=data["HighChol"],
         BMI=data["BMI"],
         Smoker=data["Smoker"],
@@ -40,7 +40,7 @@ def create_prediction_object(data, user_email, edadUser):
 # Funcion que llama al modelo y a la funcion que ejecuta la prediccion
 def make_prediction (data_prediction):
     features = [
-        float(data_prediction.HighBP), 
+        float(data_prediction.HighBp), 
         float(data_prediction.HighChol), 
         float(data_prediction.BMI), 
         float(data_prediction.Smoker), 
@@ -71,10 +71,10 @@ def predict_diabetes(modelo, scaler, data):
 # Funcion que almacena la prediccion en la DB
 def save_prediction(data):
     try:
-        current_time = datetime.now(timezone.utc)
+        current_time = datetime.now(timezone.utc).strftime('%d-%m-%Y, %H:%M:%S')
         prediction_data = {
             'user_email': data.user_email, 
-            'HighBP': data.HighBP, 
+            'HighBp': data.HighBp, 
             'HighChol': data.HighChol, 
             'BMI': data.BMI,
             'Smoker': data.Smoker, 
@@ -85,8 +85,8 @@ def save_prediction(data):
             'MentHlth': data.MentHlth, 
             'PhysHlth': data.PhysHlth,
             'Age': data.Age,
-            'rPrediccion': data.rPrediccion,
-            'timestamp': current_time
+            'prediction': data.prediction,
+            'date': current_time
         }
         prediction_created = mongo.db.prediction.insert_one(prediction_data)
         return prediction_created

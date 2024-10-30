@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 
 def save_user(data):
     try:
-        current_time = datetime.now(timezone.utc)
+        current_time = datetime.now(timezone.utc).strftime('%d-%m-%Y, %H:%M:%S')
         user_data = {
             'name': data.name,
             'last_name': data.last_name,
@@ -14,7 +14,7 @@ def save_user(data):
             'gender': data.gender,
             'birthday': data.birthday,
             'age': calculateAge(data.birthday),
-            'timestamp': current_time
+            'date': current_time
         }
         user_created = mongo.db.user.insert_one(user_data)
         mongo.db.user.create_index([('email', 1)], unique=True)
