@@ -3,7 +3,7 @@ import numpy as np
 from datetime import datetime
 from database.redis_connection import redis_connection
 from services.user_service import UserService
-from repositories.predictions_repository import crear_prediccion, obtener_predicciones
+from repositories.predictions_repository import crear_prediccion, obtener_predicciones, last_prediction
 from models.caracteristicas_prediccion import CaracteristicasPrediccion
 
 
@@ -19,7 +19,6 @@ def cargar_modelo():
 def predecir_diabetes(data, email, usuario_id):
     user_service = UserService()
     try:
-        print(usuario_id)
         usuario_id = usuario_id.split(":")[1]
         #VALIDACION DE LA EXISTENCIA DEL USUARIO
         if not user_service.usuario_existe(email):
@@ -50,7 +49,7 @@ def predecir_diabetes(data, email, usuario_id):
             resultado_prediccion[1] = "SI"
 
         response = crear_prediccion({'estadoPrediccion': str(resultado_prediccion[1]), 
-                                     'probabilidad': str(resultado_prediccion[0]), 
+                                     'prediction': str(resultado_prediccion[0]), 
                                      'fecha' : resultado_prediccion[2], 
                                      'usuario' : email }, usuario_id)
         return "Correcto funcionamiento", response
@@ -67,3 +66,10 @@ def obtener_predicciones_por_usuario(usuario_id):
     predicciones_usuario = obtener_predicciones(usuario_id)
     return predicciones_usuario, 200
 
+    
+def obtener_ultima_prediccion(user_id):
+    if user_id is None:
+        return 'ID DEL USUARIO INVALIDO O NULO', 400
+
+    user_id = str(user_id.split(':')[1])
+    return last_prediction(user_id)

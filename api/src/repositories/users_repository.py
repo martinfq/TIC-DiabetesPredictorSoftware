@@ -3,7 +3,6 @@ import hashlib, uuid, json, jwt
 
 def usuario_creado(email):
     connection = redis_connection()
-
     if connection.sismember("USUARIOS", email) == 0:
         connection.connection_pool.disconnect()
         return False
@@ -38,3 +37,17 @@ def crear_usuario(nuevo_usuario):
     connection.connection_pool.disconnect()
 
     return 200
+
+
+def obtener_datos_usuario(user_id):
+    connection = redis_connection()
+    datos_usuario = None
+
+    for clave in connection.scan_iter("usuario:*"):
+        if(clave == user_id):
+            usuario = connection.hgetall(clave)
+            datos_usuario = {"age" : usuario["fechaNacimiento"], "name" : usuario["nombre"], "gender" : usuario["genero"]}
+            break
+
+    connection.connection_pool.disconnect()
+    return datos_usuario

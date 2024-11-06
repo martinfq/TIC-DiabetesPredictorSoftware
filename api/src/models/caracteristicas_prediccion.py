@@ -37,12 +37,16 @@ class CaracteristicasPrediccion:
         if not isinstance(self.heartDiseaseOrAttack, (int, float)) or self.heartDiseaseOrAttack not in (0, 1):
             return False
 
+        #PhysActivity
+        if not isinstance(self.physActivity, (int, float)) or self.physActivity not in (0, 1):
+            return False
+
         #GenHlth
         if not isinstance(self.genHlth, (int, float)) or not (1 <= self.genHlth <= 5):
             return False
 
-        #PhysActivity, MentHlth y PhysHlth
-        for attr in [self.physActivity, self.genHlth, self.mentHlth, self.physHlth]:
+        #MentHlth y PhysHlth
+        for attr in [self.mentHlth, self.physHlth]:
             if not isinstance(attr, (int, float)) or not (0 <= attr <= 30):
                 return False
 

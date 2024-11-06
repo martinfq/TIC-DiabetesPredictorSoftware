@@ -1,4 +1,5 @@
 from repositories.users_repository import *
+from datetime import datetime
 import hashlib, jwt
 
 
@@ -34,3 +35,20 @@ class UserService:
     def usuario_existe(self, email):
         return usuario_creado(email)
 
+
+    def datos_usuario(self, user_id):
+        datos_usuario = obtener_datos_usuario(user_id)
+        if(datos_usuario == None):
+            return 'EL USUARIO NO EXISTE', 400
+
+        datos_usuario["age"] = self.calcular_edad(datos_usuario["age"])
+        return datos_usuario, 200
+
+    
+    def calcular_edad(self, fechaNacimiento):
+        fechaNacimiento = datetime.strptime(fechaNacimiento, "%Y-%m-%d")
+        fechaActual = datetime.now()
+        edad = fechaActual.year - fechaNacimiento.year
+        if (fechaActual.month, fechaActual.day) < (fechaNacimiento.month, fechaNacimiento.day):
+            edad -= 1
+        return str(edad)

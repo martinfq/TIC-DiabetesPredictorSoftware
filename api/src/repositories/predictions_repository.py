@@ -31,4 +31,22 @@ def obtener_predicciones(usuario_id):
         if connection.hget(clave, 'usuario') == usuario_id:
             predicciones_usuario.append(connection.hgetall(clave))
 
+    connection.connection_pool.disconnect()
     return predicciones_usuario
+
+
+def last_prediction(user_id):
+    connection = redis_connection()
+    last_predictions = connection.smembers("LAST_PREDICTION")
+    key_last_prediction = None
+
+    for up in last_predictions:
+        if up.startswith(f"{user_id}"):
+            user_last_prediction = up
+            break
+
+    key_last_prediction = "prediccion:" + user_last_prediction.split(':')[1]
+    last_prediction = connection.hgetall(key_last_prediction)
+
+    connection.connection_pool.disconnect()
+    return last_prediction
