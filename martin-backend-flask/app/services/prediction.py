@@ -3,6 +3,7 @@ from .predition_service import process_data
 from .models import ModeloML
 from .user import User
 import datetime
+import uuid
 
 
 class Prediction:
@@ -50,9 +51,12 @@ class Prediction:
         print(error)
         prediction = predict
 
+        pred_id = str(uuid.uuid4())
+
         db.execute_write(
             """
             CREATE (p:Prediction {
+                id:$id,
                 user_email:$user_email,
                 HighBp: $high_bp,
                 HighChol: $high_chol,
@@ -69,6 +73,7 @@ class Prediction:
             })
             """,
             {
+                "id": pred_id,
                 "user_email": user_email,
                 "high_bp": high_bp,
                 "high_chol": high_chol,
@@ -86,21 +91,17 @@ class Prediction:
         )
         query = """
             MATCH (u:User {email: $email})
-            MATCH (p:Prediction {user_email: $email})
+            MATCH (p:Prediction {id: $id})
             CREATE (u)-[:HAVE {fecha: timestamp()}]->(p)
               """
         parameters = {
             "email": user_email,
+            "id": pred_id
         }
         if prediction:
             db.execute_write(query, parameters)
             return prediction
         return 'Error al realizar la prediccion'
-        # return Prediction(next_id,
-        #                   high_bp, high_chol, bmi, smoker, stroke,
-        #                   heart_disease_or_attack, phys_activity, gen_hlth,
-        #                   ment_hlth, phys_hlth, age
-        #                   )
 
     @staticmethod
     def get_user_predictions(user_email):
@@ -116,9 +117,11 @@ class Prediction:
         for record in result:
             dt = datetime.datetime.fromtimestamp(record["h.fecha"] / 1000)
             fecha = dt.date()
+            hora = dt.strftime("%H:%M")
             predictions.append({
-                "prediction": record["p"]["Prediction"],
-                "date":fecha.isoformat()
+                "prediction": record["p"],
+                "date": fecha.isoformat(),
+                "time": hora
             })
 
         return predictions

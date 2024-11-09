@@ -18,7 +18,9 @@ class Auth:
             raise ValueError("Incorrect password")
 
         login_user(user)
-        access_token = create_access_token(identity=user.email, expires_delta=timedelta(minutes=2))
+        access_token = create_access_token(identity=user.email,
+                                           expires_delta=timedelta(minutes=20),
+                                           additional_claims={"name": user.name})
         return access_token
 
 
