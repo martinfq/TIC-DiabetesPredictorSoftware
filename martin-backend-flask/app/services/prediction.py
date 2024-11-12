@@ -47,9 +47,15 @@ class Prediction:
         ]
         modelo = ModeloML('modelANN.pkl', 'scalerANN.pkl')
         predict, error = modelo.predecir_ann(data)
-        print(predict)
-        print(error)
-        prediction = predict
+        class_0 = predict[0]
+        class_1 = predict[1]
+
+        if class_0 > class_1:
+            prediction = class_0
+            class_value = 0
+        else:
+            prediction = class_1
+            class_value = 0
 
         pred_id = str(uuid.uuid4())
 
@@ -69,7 +75,10 @@ class Prediction:
                 MentHlth: $ment_hlth,
                 PhysHlth: $phys_hlth,
                 Age: $age,
-                Prediction: $prediction
+                class_0: $class_0,
+                class_1: $class_1,
+                prediction:$prediction,
+                class:$class
             })
             """,
             {
@@ -86,7 +95,10 @@ class Prediction:
                 "ment_hlth": ment_hlth,
                 "phys_hlth": phys_hlth,
                 "age": user_age,
+                "class_0": class_0,
+                "class_1": class_1,
                 "prediction": prediction,
+                "class": class_value
             }
         )
         query = """
@@ -98,7 +110,7 @@ class Prediction:
             "email": user_email,
             "id": pred_id
         }
-        if prediction:
+        if predict:
             db.execute_write(query, parameters)
             return prediction
         return 'Error al realizar la prediccion'
@@ -139,7 +151,7 @@ class Prediction:
         result, code = db.execute_read(query, parameters)
 
         data = {
-            "prediction": result[0]["p"]["Prediction"],
+            "prediction": result[0]["p"]["prediction"],
             "date": result[0]["h.fecha"]
         }
         return data
