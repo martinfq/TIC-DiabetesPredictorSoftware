@@ -1,3 +1,5 @@
+import json
+
 from ..db.neo4j import db
 from .predition_service import process_data
 from .models import ModeloML
@@ -55,7 +57,7 @@ class Prediction:
             class_value = 0
         else:
             prediction = class_1
-            class_value = 0
+            class_value = 1
 
         pred_id = str(uuid.uuid4())
 
@@ -130,11 +132,10 @@ class Prediction:
             dt = datetime.datetime.fromtimestamp(record["h.fecha"] / 1000)
             fecha = dt.date()
             hora = dt.strftime("%H:%M")
-            predictions.append({
-                "prediction": record["p"],
-                "date": fecha.isoformat(),
-                "time": hora
-            })
+            data = record["p"]
+            data["date"] = fecha.isoformat()
+            data["time"] = hora
+            predictions.append(data)
 
         return predictions
 
