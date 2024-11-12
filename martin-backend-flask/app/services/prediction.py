@@ -47,6 +47,7 @@ class Prediction:
             high_bp, high_chol, bmi, smoker, stroke, heart_disease_or_attack, phys_activity, gen_hlth, ment_hlth,
             phys_hlth, user_age
         ]
+        #Obtener predicion
         modelo = ModeloML('modelANN.pkl', 'scalerANN.pkl')
         predict, error = modelo.predecir_ann(data)
         class_0 = predict[0]
