@@ -46,7 +46,8 @@ class Prediccion:
     def find_last_by_email(user_email):
         try:
             prediction = mongo.db.prediction.find_one({"user_email": user_email}, sort=[("_id", DESCENDING)])
-            prediction["_id"] = str(prediction["_id"])
+            if prediction:
+                prediction["_id"] = str(prediction["_id"])
             return prediction
         except PyMongoError as e:
             print(f"Error al obtener la prediccion: {e}")

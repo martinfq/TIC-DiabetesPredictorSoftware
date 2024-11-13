@@ -15,7 +15,7 @@ def validate_prediction_input(data):
     if 'HighChol' in data and (not isinstance(data['HighChol'], int) or (data['HighChol']!=0 and data['HighChol']!=1)):
         errors.append('El Chol debe ser un número entre 0 y 1.')
     
-    if 'BMI' in data and (not isinstance(data['BMI'], int) or data['BMI']<10):
+    if 'BMI' in data and (not isinstance(data['BMI'], float) or data['BMI']<10):
         errors.append('El BMI debe ser un número mayor a 10.')
     
     if 'Smoker' in data and (not isinstance(data['Smoker'], int) or (data['Smoker']!=0 and data['Smoker']!=1)):

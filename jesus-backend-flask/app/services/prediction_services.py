@@ -49,7 +49,7 @@ def create_prediction_object(data, user_email, edadUser):
         user_email=user_email,
         HighBp=data["HighBp"],
         HighChol=data["HighChol"],
-        BMI=data["BMI"],
+        BMI=round(data["BMI"], 2),
         Smoker=data["Smoker"],
         Stroke=data["Stroke"],
         HeartDiseaseorAttack=data["HeartDiseaseorAttack"],
@@ -57,7 +57,7 @@ def create_prediction_object(data, user_email, edadUser):
         GenHlth=data["GenHlth"],
         MentHlth=data["MentHlth"],
         PhysHlth=data["PhysHlth"],
-        Age=clasify_age_group(edadUser),
+        Age=edadUser,
     )
 
 # Funcion que llama al modelo y a la funcion que ejecuta la prediccion
@@ -65,7 +65,7 @@ def make_prediction (data_prediction):
     features = [
         float(data_prediction.HighBp), 
         float(data_prediction.HighChol), 
-        float(data_prediction.BMI), 
+        float(round(data_prediction.BMI, 0)), 
         float(data_prediction.Smoker), 
         float(data_prediction.Stroke), 
         float(data_prediction.HeartDiseaseorAttack), 
@@ -73,7 +73,7 @@ def make_prediction (data_prediction):
         float(data_prediction.GenHlth), 
         float(data_prediction.MentHlth), 
         float(data_prediction.PhysHlth), 
-        data_prediction.Age
+        clasify_age_group(data_prediction.Age)
     ]
 
     model_loaded = load_model()

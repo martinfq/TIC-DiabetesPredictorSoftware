@@ -11,11 +11,9 @@ user_bp = Blueprint('user', __name__)
 def add_user():
     try:
         data = request.get_json()
-        print(data)
         # Validar datos de entrada
         error = validate_user(data)
         if error:
-            print(error)
             return jsonify({'error': error}), 400
         
         user = User(
