@@ -28,7 +28,7 @@ class UserService:
             return 'CREDENCIALES INCORRECTAS.', 400
 
         #CREACION DEL TOKEN DE USUARIO
-        token_session = jwt.encode({'email': email, 'id' : credenciales[1]}, "passPrueba", algorithm='HS256')
+        token_session = jwt.encode({'email': email, 'id' : credenciales[1], 'name' : credenciales[0]}, "passPrueba", algorithm='HS256')
         return token_session, 200
 
 

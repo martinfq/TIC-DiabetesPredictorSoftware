@@ -19,10 +19,11 @@ def validar_credenciales(email, password):
         usuario = connection.hgetall(clave)
         email_user = usuario.get('email')
         password_user = usuario.get('password')
+        name_user = usuario.get('nombre')
 
         if email_user == email and password_user == password:
             connection.connection_pool.disconnect()
-            return True, clave
+            return name_user, clave
 
     connection.connection_pool.disconnect()
     return None

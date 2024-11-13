@@ -29,7 +29,20 @@ def obtener_predicciones(usuario_id):
 
     for clave in claves:
         if connection.hget(clave, 'usuario') == usuario_id:
-            predicciones_usuario.append(connection.hgetall(clave))
+            prediction = connection.hgetall(clave)
+            prediction['prediction'] = float(prediction['prediction'])
+            prediction['BMI'] = float(prediction['BMI'])
+            prediction['class'] = int(prediction['class'])
+            prediction['Stroke'] = float(prediction['Stroke'])
+            prediction['HighBp'] = float(prediction['HighBp'])
+            prediction['HighChol'] = float(prediction['HighChol'])
+            prediction['Smoker'] = float(prediction['Smoker'])
+            prediction['HeartDiseaseorAttack'] = float(prediction['HeartDiseaseorAttack'])
+            prediction['PhysActivity'] = int(prediction['PhysActivity'])
+            prediction['GenHlth'] = int(prediction['GenHlth'])
+            prediction['MentHlth'] = int(prediction['MentHlth'])
+            prediction['PhysHlth'] = int(prediction['PhysHlth'])
+            predicciones_usuario.append(prediction)
 
     connection.connection_pool.disconnect()
     return predicciones_usuario

@@ -45,7 +45,7 @@ def crear_prediccion():
 
 
 
-@app.route('/predictions', methods=['GET'])
+@app.route('/predict/', methods=['GET'])
 def obtener_predicciones():
     token_session = request.headers.get('Authorization')
     if not token_session:
@@ -57,7 +57,7 @@ def obtener_predicciones():
         if predicciones[1] != 200:
             return jsonify({'mensaje': predicciones[0]}), resultado[1]
 
-        return jsonify({'Predicciones': predicciones[0]}), 200
+        return jsonify(predicciones[0]), 200
     except jwt.InvalidTokenError:
         return jsonify({'ERROR': 'TOKEN INVALIDO'}), 400
 

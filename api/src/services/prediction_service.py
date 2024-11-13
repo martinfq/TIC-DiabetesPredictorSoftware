@@ -10,8 +10,10 @@ from models.caracteristicas_prediccion import CaracteristicasPrediccion
 def cargar_modelo():
     try:
         with open('modelANN.pkl', 'rb') as file:
-            modelo_cargado = pickle.load(file)
-        return modelo_cargado
+            modelo = pickle.load(file)
+        with open('scalerANN.pkl', 'rb') as file:
+            scaler = pickle.load(file)
+        return modelo, scaler
     except Exception as e:
         raise RuntimeError(f"No se pudo cargar el modelo: {str(e)}")
 
@@ -27,31 +29,47 @@ def predecir_diabetes(data, email, usuario_id):
         #VALIDACION DEL DOMINIO DE LOS CAMPOS
         if not data.is_valid():
             return 'ERROR. CUERPO DE LA SOLICITUD INCORRECTO.', 400
+        predictionAge = categorize_age(data.age)
         caracteristicas = np.array([
-            data.highBP,
-            data.highChol,
-            data.bmi,
-            data.smoker,
-            data.stroke,
-            data.heartDiseaseOrAttack,
-            data.physActivity,
-            data.genHlth,
-            data.mentHlth,
-            data.physHlth,
-            data.age
-        ]).astype(float) 
-        modelo = cargar_modelo()
-        prediccion = modelo.predict(caracteristicas.reshape(1, -1))[0]
-        resultado_prediccion = [prediccion[0], "NO", datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
+            float(data.highBP),
+            float(data.highChol),
+            float(data.bmi),
+            float(data.smoker),
+            float(data.stroke),
+            float(data.heartDiseaseOrAttack),
+            float(data.physActivity),
+            float(data.genHlth),
+            float(data.mentHlth),
+            float(data.physHlth),
+            float(predictionAge)
+        ])
+        modelo, scaler = cargar_modelo()
+        caracteristicas_escaladas = scaler.transform(caracteristicas.reshape(1,-1))
+        prediccion = modelo.predict(caracteristicas_escaladas)[0]
+        print(prediccion)
+        resultado_prediccion = [prediccion[0], 0, datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
         
         if prediccion[0] < prediccion[1]:
             resultado_prediccion[0] = prediccion[1]
-            resultado_prediccion[1] = "SI"
+            resultado_prediccion[1] = 1
 
-        response = crear_prediccion({'estadoPrediccion': str(resultado_prediccion[1]), 
-                                     'prediction': str(resultado_prediccion[0]), 
-                                     'fecha' : resultado_prediccion[2], 
-                                     'usuario' : email }, usuario_id)
+        response = crear_prediccion({
+            'class': resultado_prediccion[1], 
+            'prediction': str(resultado_prediccion[0]), 
+            'date': resultado_prediccion[2], 
+            'usuario': email, 
+            'Stroke': data.stroke,
+            'HighBp': data.highBP,
+            'HighChol': data.highChol, 
+            'BMI': data.bmi, 
+            'Smoker': data.smoker,
+            'HeartDiseaseorAttack': data.heartDiseaseOrAttack,
+            'PhysActivity': data.physActivity, 
+            'GenHlth': data.genHlth, 
+            'MentHlth': data.mentHlth,
+            'PhysHlth': data.physHlth,
+            'Age': data.age 
+        }, usuario_id);
         return "Correcto funcionamiento", response
     except Exception as e:
         raise RuntimeError(f"Error al hacer la predicción: {str(e)}")
@@ -73,3 +91,33 @@ def obtener_ultima_prediccion(user_id):
 
     user_id = str(user_id.split(':')[1])
     return last_prediction(user_id)
+
+def categorize_age(age):
+    ageCategory = 0
+    if 18 <= age <= 24:
+        ageCategory = 1
+    elif 25 <= age <= 29:
+        ageCategory = 2
+    elif 30 <= age <= 34:
+        ageCategory = 3
+    elif 35 <= age <= 39:
+        ageCategory = 4
+    elif 40 <= age <= 44:
+        ageCategory = 5
+    elif 45 <= age <= 49:
+        ageCategory = 6
+    elif 50 <= age <= 54:
+        ageCategory = 7
+    elif 55 <= age <= 59:
+        ageCategory = 8
+    elif 60 <= age <= 64:
+        ageCategory = 9
+    elif 65 <= age <= 69:
+        ageCategory = 10
+    elif 70 <= age <= 74:
+        ageCategory = 11
+    elif 75 <= age <= 79:
+        ageCategory = 12
+    elif 80 <= age:
+        ageCategory = 13
+    return ageCategory
