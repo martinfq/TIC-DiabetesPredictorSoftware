@@ -77,7 +77,7 @@ def validate_nombreApellido(nombreApellido):
 
 
 def validate_genero(gender):
-    password_regex = r'^(Masculino|Femenino)$'
+    password_regex = r'^(Masculino|Femenino|M|F)$'
 
     return re.match(password_regex, gender) is not None
 

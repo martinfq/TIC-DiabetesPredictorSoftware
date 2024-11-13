@@ -11,10 +11,11 @@ user_bp = Blueprint('user', __name__)
 def add_user():
     try:
         data = request.get_json()
-
+        print(data)
         # Validar datos de entrada
         error = validate_user(data)
         if error:
+            print(error)
             return jsonify({'error': error}), 400
         
         user = User(
@@ -37,14 +38,15 @@ def login():
     data = request.json
 
     email = data.get('email')
+    user = User.find_by_email(email)
+    nombre = user['name']
     password = data.get('password')
-    
     error = validate_login(data)
     if error:
         return jsonify({'error': error}), 400
 
     #CREACION DEL TOKEN DE USUARIO
-    access_token = jwt.encode({'email': email}, "passPrueba", algorithm='HS256')
+    access_token = jwt.encode({'email': email, 'name': nombre}, "passPrueba", algorithm='HS256')
     return jsonify({'access_token': access_token}), 200
 
 #============================ USUARIO: GET ALL ============================#

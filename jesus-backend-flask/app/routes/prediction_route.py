@@ -29,16 +29,19 @@ def add_prediction():
 
         # Creo el objeto para la prediccion
         data_prediction = create_prediction_object(data, user_email, edadUser)
-        # Realizo la prediccion y obtengo su valor
-        data_prediction.prediction = make_prediction(data_prediction)
+
+        # Realizo la prediccion, obtengo su valor y el de la clase
+        data_prediction_result = make_prediction(data_prediction)
+
         # Guardo la prediccion en la base de datos
-        save_prediction(data_prediction)
+        save_prediction(data, data_prediction_result)
 
         return jsonify({
             'message': "Prediction added successfully",
             'usuario': user_email,
             'edad': edadUser,
-            'prediccion': data_prediction.prediction
+            'prediccion_clase': data_prediction_result["prediction_class"],
+            'prediccion': data_prediction_result["prediction_confidence"]
         }), 201
     except jwt.ExpiredSignatureError:
         abort(401, description='Token expirado')
