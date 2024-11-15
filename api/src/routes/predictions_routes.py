@@ -41,7 +41,7 @@ def crear_prediccion():
 
         return jsonify({'mensaje': 'PREDICCION REGISTRADA CON EXITO'}), 200
     except jwt.InvalidTokenError:
-        return jsonify({'ERROR': 'TOKEN INVALIDO'}), 400
+        return jsonify({'ERROR': 'TOKEN INVALIDO'}), 401
 
 
 
@@ -59,7 +59,7 @@ def obtener_predicciones():
 
         return jsonify(predicciones[0]), 200
     except jwt.InvalidTokenError:
-        return jsonify({'ERROR': 'TOKEN INVALIDO'}), 400
+        return jsonify({'ERROR': 'TOKEN INVALIDO'}), 401
 
 
 
@@ -75,4 +75,4 @@ def last_prediction():
 
         return jsonify(last_prediction), 200
     except jwt.InvalidTokenError:
-        return jsonify({'ERROR': 'TOKEN INVALIDO'}), 400
+        return jsonify({'ERROR': 'TOKEN INVALIDO'}), 401

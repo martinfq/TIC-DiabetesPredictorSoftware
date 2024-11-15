@@ -53,4 +53,4 @@ def obtener_datos_usuario():
             return jsonify({'error': resultado[0]}), resultado[1]
         return jsonify(user_data[0]), 200
     except jwt.InvalidTokenError:
-        return jsonify({'ERROR': 'TOKEN INVALIDO'}), 400
+        return jsonify({'ERROR': 'TOKEN INVALIDO'}), 401
