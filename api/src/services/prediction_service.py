@@ -2,6 +2,7 @@ import pickle
 import numpy as np
 from datetime import datetime
 from database.redis_connection import redis_connection
+from pathlib2 import Path
 from services.user_service import UserService
 from repositories.predictions_repository import crear_prediccion, obtener_predicciones, last_prediction
 from models.caracteristicas_prediccion import CaracteristicasPrediccion
@@ -9,9 +10,10 @@ from models.caracteristicas_prediccion import CaracteristicasPrediccion
 
 def cargar_modelo():
     try:
-        with open('modelANN.pkl', 'rb') as file:
+        parent_route = Path(__file__).resolve().parent.parent
+        with open(parent_route / 'modelANN.pkl', 'rb') as file:
             modelo = pickle.load(file)
-        with open('scalerANN.pkl', 'rb') as file:
+        with open(parent_route / 'scalerANN.pkl', 'rb') as file:
             scaler = pickle.load(file)
         return modelo, scaler
     except Exception as e:

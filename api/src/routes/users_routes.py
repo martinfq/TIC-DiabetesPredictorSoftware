@@ -46,7 +46,7 @@ def obtener_datos_usuario():
         return jsonify({'ERROR': 'TOKEN FALTANTE'}), 401
 
     try:
-        user_id = jwt.decode(token_session.split(" ")[1], "passPrueba", algorithms=['HS256']).get("id")     
+        user_id = jwt.decode(token_session.split(" ")[1], user_service.encryptionKey, algorithms=['HS256']).get("id")     
         user_data = user_service.datos_usuario(user_id)
 
         if user_data[1] != 200:

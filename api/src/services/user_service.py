@@ -1,9 +1,12 @@
 from repositories.users_repository import *
+from dotenv import load_dotenv
 from datetime import datetime
-import hashlib, jwt
+import hashlib, jwt, os
 
 
 class UserService:
+    load_dotenv()
+    encryptionKey = os.getenv('ENCRIPTION_KEY')
     def crear_usuario(self, usuario):
         
         #VALIDACION DEL DOMINIO DE LOS CAMPOS
@@ -28,7 +31,7 @@ class UserService:
             return 'CREDENCIALES INCORRECTAS.', 400
 
         #CREACION DEL TOKEN DE USUARIO
-        token_session = jwt.encode({'email': email, 'id' : credenciales[1], 'name' : credenciales[0]}, "passPrueba", algorithm='HS256')
+        token_session = jwt.encode({'email': email, 'id' : credenciales[1], 'name' : credenciales[0]}, self.encryptionKey, algorithm='HS256')
         return token_session, 200
 
 

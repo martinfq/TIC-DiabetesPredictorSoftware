@@ -5,6 +5,7 @@ from services.user_service import *
 from models.caracteristicas_prediccion import CaracteristicasPrediccion
 
 app = Blueprint('predictions_blueprint', __name__)
+user_service = UserService()
 
 @app.route('/predict/register', methods=['POST'])
 def crear_prediccion():
@@ -17,10 +18,12 @@ def crear_prediccion():
         return jsonify({'ERROR': 'TOKEN FALTANTE'}), 401
 
     try:
-        email = jwt.decode(token_session.split(" ")[1], "passPrueba", algorithms=['HS256']).get("email")
-        usuario_id = jwt.decode(token_session.split(" ")[1], "passPrueba", algorithms=['HS256']).get("id")
-        user_service = UserService()
-        user_data = user_service.datos_usuario(usuario_id)[0]
+        email = jwt.decode(token_session.split(" ")[1], user_service.encryptionKey, algorithms=['HS256']).get("email")
+        usuario_id = jwt.decode(token_session.split(" ")[1], user_service.encryptionKey, algorithms=['HS256']).get("id")
+        user_data = user_service.datos_usuario(usuario_id)
+        
+        if user_data[1] != 200:
+            return jsonify({'error': user_data[0]})
 
         caracteristicas = CaracteristicasPrediccion(
             highBP = data.get('HighBp'),
@@ -33,7 +36,7 @@ def crear_prediccion():
             genHlth = data.get('GenHlth'),
             mentHlth = data.get('MentHlth'),
             physHlth = data.get('PhysHlth'),
-            age = int(user_data['age'])
+            age = int(user_data[0]['age'])
         )
         resultado = predecir_diabetes(caracteristicas, email, usuario_id)
         if resultado[1] != 200:
@@ -52,7 +55,7 @@ def obtener_predicciones():
         return jsonify({'ERROR': 'TOKEN FALTANTE'}), 401
 
     try:
-        email = jwt.decode(token_session.split(" ")[1], "passPrueba", algorithms=['HS256']).get("email")    
+        email = jwt.decode(token_session.split(" ")[1], user_service.encryptionKey, algorithms=['HS256']).get("email")    
         predicciones = obtener_predicciones_por_usuario(email)
         if predicciones[1] != 200:
             return jsonify({'mensaje': predicciones[0]}), resultado[1]
@@ -70,7 +73,7 @@ def last_prediction():
         return jsonify({'ERROR': 'TOKEN FALTANTE'}), 401
 
     try:
-        user_id = jwt.decode(token_session.split(" ")[1], "passPrueba", algorithms=['HS256']).get("id")     
+        user_id = jwt.decode(token_session.split(" ")[1], user_service.encryptionKey, algorithms=['HS256']).get("id")     
         last_prediction = obtener_ultima_prediccion(user_id)
 
         return jsonify(last_prediction), 200
