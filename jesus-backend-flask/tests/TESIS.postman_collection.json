@@ -1,0 +1,208 @@
+{
+	"info": {
+		"_postman_id": "b2e05df8-77b4-4443-8df0-64c9ff0cd649",
+		"name": "TESIS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28075791"
+	},
+	"item": [
+		{
+			"name": "USER",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Marcosss\",\r\n    \"last_name\": \"Aureliosss\",\r\n    \"email\": \"marcosss@epn.edu.ec\",\r\n    \"password\": \"Marco1234*\",\r\n    \"gender\": \"M\",\r\n    \"birthday\": \"1984-02-15\"\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5000/user/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"user",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by email",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1AaG90bWFpbC5jb20iLCJuYW1lIjoiTWFyY2VsbyJ9.9CwYMHFrHUvXxWJvVwHbiyd4ZtAvATUB_DArTivReU0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/user/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"user",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"marcelo@epn.edu.ec\",\r\n    \"password\": \"Mn1234*k\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ML",
+			"item": [
+				{
+					"name": "Register Prediction",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1AaG90bWFpbC5jb20iLCJuYW1lIjoiTWFyY2VsbyJ9.9CwYMHFrHUvXxWJvVwHbiyd4ZtAvATUB_DArTivReU0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"HighBp\": 0,\r\n    \"HighChol\":0,\r\n    \"BMI\": 50,\r\n    \"Smoker\": 0,\r\n    \"Stroke\": 0,\r\n    \"HeartDiseaseorAttack\": 0,\r\n    \"PhysActivity\": 1,\r\n    \"GenHlth\": 1,\r\n    \"MentHlth\": 1,\r\n    \"PhysHlth\": 1\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5000/predict/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"predict",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Prediction by email",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1AaG90bWFpbC5jb20iLCJuYW1lIjoiTWFyY2VsbyJ9.9CwYMHFrHUvXxWJvVwHbiyd4ZtAvATUB_DArTivReU0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/predict/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"predict",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get last prediction",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1AaG90bWFpbC5jb20iLCJuYW1lIjoiTWFyY2VsbyJ9.9CwYMHFrHUvXxWJvVwHbiyd4ZtAvATUB_DArTivReU0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/last-predict/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"last-predict",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
