@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_pymongo import PyMongo
 from app.config import Config
 from flask_cors import CORS
@@ -18,5 +18,14 @@ def create_app():
 
     app.register_blueprint(user_bp)
     app.register_blueprint(prediction_bp)
+
+    #errores
+    @app.errorhandler(401)
+    def unauthorized_error(e):
+        return jsonify({"message": str(e)}), 401
+    
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        return jsonify({"message": f'error {str(e)}'}), 500
     
     return app

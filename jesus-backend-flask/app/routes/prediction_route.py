@@ -24,9 +24,10 @@ def add_prediction():
         data = request.get_json()
         # Validar datos de entrada
         error = validate_prediction_input(data)
+        print(data)
         if error:
             abort(400, description=error)
-
+            
         # Creo el objeto para la prediccion
         data_prediction = create_prediction_object(data, user_email, edadUser)
 
@@ -49,12 +50,6 @@ def add_prediction():
         abort(401, description='Token inválido')
     except Exception as e:
         abort(500, description=f'error {str(e)}')
-
-#============================ PREDICCION: GET ALL ============================#
-@prediction_bp.route("/predicts/", methods=["GET"])
-def get_all_predictions():
-    predictions = Prediccion.find_all()
-    return jsonify(predictions), 200
 
 #============================ PREDICCION: GET BY EMAIL ============================#
 @prediction_bp.route('/predict/', methods=['GET'])
@@ -98,22 +93,3 @@ def get_last_prediction():
     except Exception as e:
         # Manejo de errores adicionales
         return jsonify({'error': f'Ocurrió un error: {str(e)}'}), 500
-    
-
-#============================ PREDICCION: DELETE ============================#
-@prediction_bp.route('/delete_predict/', methods=['DELETE'])
-def delete_user():
-    # leo el token
-    access_token = request.headers.get('Authorization')
-    # validacion del token 
-    if not access_token:
-        return jsonify({'error': 'Token faltante'}), 401
-    # info del usuario
-    user_email = jwt.decode(access_token.split(" ")[1], "passPrueba", algorithms=['HS256'])['email']
-    # busco la prediccion
-    prediction = Prediccion.find_by_email(user_email)
-    if prediction:
-        Prediccion.delete(user_email)
-        return jsonify({'message': 'Prediction deleted successfully'}), 200
-    else:
-        return jsonify({'error': 'Prediction not found'}), 404

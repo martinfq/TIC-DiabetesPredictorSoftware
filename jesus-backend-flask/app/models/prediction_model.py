@@ -17,18 +17,6 @@ class Prediccion:
         self.PhysHlth = PhysHlth
         self.Age = Age
         self.prediction = None
-        
-    @staticmethod
-    def find_all():
-        try:
-            prediction_list = []
-            for prediction in mongo.db.prediction.find():
-                prediction["_id"] = str(prediction["_id"])
-                prediction_list.append(prediction)
-            return prediction_list
-        except PyMongoError as e:
-            print(f"Error al obtener las predicciones: {e}")
-            return None
 
     @staticmethod
     def find_by_email(user_email):
@@ -52,11 +40,3 @@ class Prediccion:
         except PyMongoError as e:
             print(f"Error al obtener la prediccion: {e}")
             return None
-        
-    @staticmethod
-    def delete(user_email):
-        try:
-            return mongo.db.prediction.delete_many({"user_email": user_email})
-        except PyMongoError as e:
-            print(f"Error al eliminar la prediccion: {e}")
-            return False

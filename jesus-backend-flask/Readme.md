@@ -19,3 +19,7 @@ npm run dev
 ## FINALIZAR
 
 deactivate
+
+## PRUEBAS UNITARIAS
+
+pytest -v --tb=short tests/test_prediction_services.py

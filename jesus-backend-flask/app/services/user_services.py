@@ -29,6 +29,9 @@ def calculateAge(birthday):
         birth_date = datetime.strptime(birthday, '%Y-%m-%d').date()
         age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
         return age
+    except ValueError as ve:
+        print(f"Error en el formato de la fecha: {ve}") 
+        return False
     except PyMongoError as e:
         print(f"Error en el calculo de edad: {e}")
         return False

@@ -60,42 +60,43 @@ def create_prediction_object(data, user_email, edadUser):
         Age=edadUser,
     )
 
-# Funcion que llama al modelo y a la funcion que ejecuta la prediccion
-def make_prediction (data_prediction):
-    features = [
-        float(data_prediction.HighBp), 
-        float(data_prediction.HighChol), 
-        float(round(data_prediction.BMI, 0)), 
-        float(data_prediction.Smoker), 
-        float(data_prediction.Stroke), 
-        float(data_prediction.HeartDiseaseorAttack), 
-        float(data_prediction.PhysActivity), 
-        float(data_prediction.GenHlth), 
-        float(data_prediction.MentHlth), 
-        float(data_prediction.PhysHlth), 
-        clasify_age_group(data_prediction.Age)
-    ]
-
-    model_loaded = load_model()
-    model, scaler = model_loaded
-    return predict_diabetes(model, scaler, features)
-
 # Funcion que ejecuta la prediccion
 def predict_diabetes(modelo, scaler, data):
     try:
         np_features = np.array(data).reshape(1,-1)
-
         scaled_features = scaler.transform(np_features)
-
         result_predict = modelo.predict(scaled_features)[0]
 
         prediction_class = int(np.argmax(result_predict))
         prediction_confidence = round(float(result_predict[prediction_class]),4)
-        
         return {"prediction_class": prediction_class, "prediction_confidence": prediction_confidence}
     except Exception as e:
         print(f"Error al crear la prediccion: {e}")
         return None
+    
+# Funcion que prepara los datos, carga el modelo y ejecuta la predicción
+def make_prediction (data_prediction):
+    try:
+        features = [
+            float(data_prediction.HighBp), 
+            float(data_prediction.HighChol), 
+            float(round(data_prediction.BMI, 0)), 
+            float(data_prediction.Smoker), 
+            float(data_prediction.Stroke), 
+            float(data_prediction.HeartDiseaseorAttack), 
+            float(data_prediction.PhysActivity), 
+            float(data_prediction.GenHlth), 
+            float(data_prediction.MentHlth), 
+            float(data_prediction.PhysHlth), 
+            clasify_age_group(data_prediction.Age)
+        ]
+
+        model_loaded = load_model()
+        model, scaler = model_loaded
+        return predict_diabetes(model, scaler, features)
+    except Exception as e:
+        print(f"Error en el flujo de predicción: {e}")
+        raise
 
 # Funcion que almacena la prediccion en la DB
 def save_prediction(data, data_prediction_result):

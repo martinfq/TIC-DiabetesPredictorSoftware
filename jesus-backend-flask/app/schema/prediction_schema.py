@@ -15,7 +15,7 @@ def validate_prediction_input(data):
     if 'HighChol' in data and (not isinstance(data['HighChol'], int) or (data['HighChol']!=0 and data['HighChol']!=1)):
         errors.append('El Chol debe ser un número entre 0 y 1.')
     
-    if 'BMI' in data and (not isinstance(data['BMI'], float) or data['BMI']<10):
+    if 'BMI' in data and (not isinstance(data['BMI'], (float, int)) or data['BMI']<10):
         errors.append('El BMI debe ser un número mayor a 10.')
     
     if 'Smoker' in data and (not isinstance(data['Smoker'], int) or (data['Smoker']!=0 and data['Smoker']!=1)):
@@ -30,13 +30,13 @@ def validate_prediction_input(data):
     if 'PhysActivity' in data and (not isinstance(data['PhysActivity'], int) or (data['PhysActivity']!=0 and data['PhysActivity']!=1)):
         errors.append('El PhysActivity debe ser un número entre 0 y 1.')
 
-    if 'GenHlth' in data and (not isinstance(data['GenHlth'], int) or (data['GenHlth']<0 and data['GenHlth']>5)):
+    if 'GenHlth' in data and (not isinstance(data['GenHlth'], int) or (data['GenHlth']<0 or data['GenHlth']>5)):
         errors.append('El GenHlth debe ser un número entre 1 y 5.')
 
-    if 'MentHlth' in data and (not isinstance(data['MentHlth'], int) or (data['MentHlth']<0 and data['MentHlth']>30)):
+    if 'MentHlth' in data and (not isinstance(data['MentHlth'], int) or (data['MentHlth']<0 or data['MentHlth']>30)):
         errors.append('El MentHlth debe ser un número entre 0 y 30.')
 
-    if 'PhysHlth' in data and (not isinstance(data['PhysHlth'], int) or (data['PhysHlth']<0 and data['PhysHlth']>30)):
+    if 'PhysHlth' in data and (not isinstance(data['PhysHlth'], int) or (data['PhysHlth']<0 or data['PhysHlth']>30)):
         errors.append('El PhysHlth debe ser un número entre 0 y 1.')
 
     return errors if errors else None

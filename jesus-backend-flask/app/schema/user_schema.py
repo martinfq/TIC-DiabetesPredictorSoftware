@@ -11,7 +11,7 @@ def validate_login(data):
     # Verifica que los campos no esten vacios
     for field in required_fields:
         if field not in data or not isinstance(data[field], str):
-            errors.append(f'{field.capitalize()} es requerido')
+            errors.append(f'El campo {field} es requerido.')
     
     # Verifica el contenido de cada campo
     if 'email' in data and not mongo.db.user.find_one({'email': data['email']}):
@@ -32,7 +32,7 @@ def validate_user(data):
     # Verifica que los campos no esten vacios
     for field in required_fields:
         if field not in data or not isinstance(data[field], str):
-            errors.append(f'{field.capitalize()} is required')
+            errors.append(f'El campo {field} es requerido.')
     
     # Verifica el contenido de cada campo
     if 'name' in data and not validate_nombreApellido(data['name']):
@@ -67,7 +67,7 @@ def validate_email(email):
 
 
 def validate_password(password):
-    password_regex = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+    password_regex = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!#@])[A-Za-z\d@$!#@]{8,}$'
     return re.match(password_regex, password) is not None
 
 
