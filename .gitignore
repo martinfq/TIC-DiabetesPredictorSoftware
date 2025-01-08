@@ -4,5 +4,4 @@ logs.log
 venv
 .env
 __pycache__
-diabetes_modelo/
 mock_front/
