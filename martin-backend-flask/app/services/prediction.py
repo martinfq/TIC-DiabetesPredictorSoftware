@@ -45,7 +45,7 @@ class Prediction:
 
         data = [
             high_bp, high_chol, bmi, smoker, stroke, heart_disease_or_attack, phys_activity, gen_hlth, ment_hlth,
-            phys_hlth, user_age
+            phys_hlth, round(user_age/10)
         ]
         #Obtener predicion
         modelo = ModeloML('modelANN.pkl', 'scalerANN.pkl')
@@ -154,6 +154,7 @@ class Prediction:
 
         data = {
             "prediction": result[0]["p"]["prediction"],
+            "class": result[0]["p"]["class"],
             "date": result[0]["h.fecha"]
         }
         return data
