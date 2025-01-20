@@ -1,0 +1,2 @@
+runtime: 312
+entrypoint: gunicorn -b :$PORT app:app

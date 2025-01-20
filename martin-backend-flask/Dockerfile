@@ -1,17 +1,20 @@
-FROM python:3.12-slim
+# Usa Python 3.12 como imagen base
+FROM python:3.12-bookworm
 
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    python3-distutils \
-    python3-setuptools \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* \
-
+# Establece el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-COPY requirements.txt requirements.txt
+RUN apt-get update
 
-RUN pip install --no-cache-dir -r requirements.txt
-
+# Copia los archivos de la aplicación al contenedor
 COPY . .
 
-CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
+# Instala las dependencias de la aplicación
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Expone el puerto 5000 (el predeterminado de Flask)
+EXPOSE 5000
+
+# Comando de entrada predeterminado para iniciar Gunicorn
+# Cambiamos el puerto a 5000 en el binding de Gunicorn
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:create_app()"]
